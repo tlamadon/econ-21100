@@ -1,0 +1,26 @@
+name: "Econ 21100 "
+output_dir: "../docs"
+navbar:
+  title: "Econ 21100"
+  left:
+    - text: "Home"
+      icon: fa-home      
+      href: index.html
+    - text: "Homeworks"
+      icon: fa-pencil     
+      menu:
+        - text: "Probability"
+          href: hw-probability.html
+  right:
+    - icon: fa-github
+      href: https://github.com/tlamadon/econ-21100
+    - icon: fa-bug
+      href: https://github.com/tlamadon/econ-21100/issues
+output:
+  html_document:
+    theme: cosmo
+    highlight: textmate
+    include:
+      after_body: footer.html
+      in_header:  header.html
+    css: styles.css
