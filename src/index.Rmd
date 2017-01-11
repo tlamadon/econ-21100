@@ -5,9 +5,27 @@ This contains help files for homeworks for _Econ 21100_. The corresponding githu
 <!-- Place this tag where you want the button to render. -->
 <a class="github-button" href="https://github.com/tlamadon/econ-21100/archive/master.zip" data-icon="octicon-cloud-download" data-style="mega" aria-label="Download tlamadon/econ-21100 on GitHub">Download</a>  <a class="github-button" href="https://github.com/tlamadon/econ-21100/fork" data-icon="octicon-repo-forked" data-style="mega" data-count-href="/tlamadon/econ-21100/network" data-count-api="/repos/tlamadon/econ-21100#forks_count" data-count-aria-label="# forks on GitHub" aria-label="Fork tlamadon/econ-21100 on GitHub">Fork</a>
 
+## Class content
 
+  -	Review
+    -	Probability Refresher
+    -	Model Identification, Estimation & Inference
+    -	Review of OLS, IV
+  -	Linear Panel Data with applications
+    -	Controlling for unobserved heterogeneity
+    -	Measurement error
+    -	Clustering of standard errors
+  -	Maximum likelihood estimators
+    -	Inference
+    -	Latent heterogeneity, the EM algorithm
+    -	Discrete choices & Mixtures
+  -	Advanced Topics
+    -	Resampling methods
+    -	Bayesian Inference 
+    -	Model selection and regularization
+    -	Bipartite data: Two-way fixed effects 
 
-## Getting started {#start}
+## Getting started with R {#start}
 
 You will first need to install `R` and `Rstudio`. To do use the following links:
 
