@@ -6,6 +6,13 @@ header-includes:
 - \usepackage{graphicx}
 - \usepackage{setspace}
 - \usepackage{cleveref}
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
 ---
 
 \newcommand{\beq}{\begin{equation}}
