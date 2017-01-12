@@ -1,0 +1,167 @@
+---
+title: "ECON 21100 - R regression"
+author: "Wooyong Lee"
+output: github_document
+header-includes:
+- \usepackage{amsfonts,amssymb,amsmath}
+- \usepackage{graphicx}
+- \usepackage{setspace}
+- \usepackage{cleveref}
+---
+
+\newcommand{\beq}{\begin{equation}}
+\newcommand{\eeq}{\end{equation}}
+\newcommand{\beqr}{\begin{eqnarray}}
+\newcommand{\eeqr}{\end{eqnarray}}
+\newcommand{\nn}{\nonumber\\}
+
+\newcommand{\var}{\textrm{Var}}
+\newcommand{\cov}{\textrm{Cov}}
+\newcommand{\corr}{\textrm{Corr}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\pp}{\mathbb{P}}
+\newcommand{\veps}{\varepsilon}
+\newcommand{\diag}{\textrm{diag}}
+
+\newcommand{\by}{\bar Y}
+\newcommand{\bx}{\bar X}
+\newcommand{\beps}{\bar\varepsilon}
+\newcommand{\pt}{\partial}
+
+\newcommand{\tb}{\textbf}
+\newcommand{\ti}{\textit}
+\newcommand{\mb}{\mathbb}
+\newcommand{\mc}{\mathcal}
+\newcommand{\st}{\qquad\text{subject to}\qquad}
+\newcommand{\ra}{\quad\Rightarrow\quad}
+
+\newcommand{\bsni}{\bigskip\noindent}
+
+```{r header, echo=FALSE, message=FALSE, warning=FALSE}
+Sys.setenv(lang="EN")
+```
+
+
+# Linear regression
+
+## The lm function
+
+The function that does the regression is `lm`. To see how it works, let's use this dataset as an example.
+
+```{r lm}
+library(datasets)
+mtcars
+rownames(mtcars) = NULL # let's remove the row-labels as we don't care them for our purpose.
+mtcars
+```
+
+If we want to regress `mpg` on a constant and `wt`, we write this.
+
+```{r lm2}
+regressionFit = lm(mpg ~ wt, data = mtcars)
+```
+
+We saved the return value of `lm` to `regressionFit`. It is a complicated object:
+
+```{r lm3}
+str(regressionFit)
+```
+
+But we see familiar names such as `coefficients`, `residuals`, and `fitted.values`. We can access these in the way that we access subvariables in a list.
+
+```{r lm3-2}
+regressionFit$coefficients
+regressionFit$residuals
+regressionFit$fitted.values
+```
+
+
+
+To see the usual results that we get from other languages, type these:
+
+```{r lm4}
+regressionFit
+print(regressionFit)
+summary(regressionFit)
+```
+
+To run a regression without a constant, do the following.
+
+```{r lm5}
+regFitWithoutConst = lm(mpg ~ -1 + wt, data=mtcars)
+summary(regFitWithoutConst)
+```
+
+Of course we can add other regressors.
+
+```{r lm6}
+regressionFit = lm(mpg ~ wt + cyl + disp, data=mtcars)
+summary(regressionFit)
+```
+
+As we have seen in the `ggplot2` tutorial, the variable `cyl` has only three values: `4`, `6,` `8`. We may want to treat `cyl` as a categorical variable and not a continuous variable. To do this so that we regress `mpg` on indicators of `cyl`, we use the `factor` function.
+
+```{r lm7}
+regressionFit = lm(mpg ~ wt + factor(cyl) + disp, data=mtcars)
+summary(regressionFit)
+```
+
+If you want to use `wt^2` as a regressor, one way is to create another column in the `data.frame`.
+
+```{r lm8}
+mtcars$wt2 = mtcars$wt^2 # the dataframe creates the column wt2 and assign the values.
+mtcars
+summary(lm(mpg ~ wt + wt2, data=mtcars))
+```
+
+Another way that does not involve creating a column is the following.
+
+```{r lm9}
+summary(lm(mpg ~ wt + I(wt^2), data=mtcars))
+```
+
+The sums work similarly: e.g. `I(cyl+disp)`.
+
+What is the function `I()`? The answer is related to what is the nature of the first argument of `lm`.
+
+## The formula
+
+We have been omitting the label for the first argument. The first argument of the `lm` function is `formula`:
+
+```{r formula}
+lm(formula = mpg ~ wt + disp, data=mtcars)
+```
+
+`formula` is a special object that interprets "expression". Note that we don't need to specify `mpg ~ wt + disp` as string, in which case we need to write `"mpg ~ wt + disp"`. In this "expression", the operators like `~` and `+` work differently from the usual way. For example, `+` in the formula is not an arithmetic operator, but an operator that says we have multiple regressors.
+
+The function `I` orders R to read operators like `+` and `^` inside `I` as an arithmetic operator. So the operator `^` in `I(wt^2)` is interpreted as a power operator. Similarly, `I(cyl+disp)` interprets `+` as an arithmetic operator and not the operator that says we have two regressors `cyl` and `disp`.
+
+
+# probit and logit
+
+For probit and logit, we use `glm`. Using it is very much similar to using `lm`.
+
+```{r glm}
+# recall:
+mtcars
+
+# let's run probit with some random formula. 
+probitFit = glm(am ~ mpg + disp, family = binomial(link="probit"), data = mtcars)
+probitFit
+summary(probitFit)
+
+# let's run logit.
+logitFit = glm(am ~ mpg + disp, family = binomial(link="logit"), data = mtcars)
+logitFit
+summary(logitFit)
+
+```
+
+
+
+
+
+
+
+
+

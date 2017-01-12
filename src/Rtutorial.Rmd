@@ -1,0 +1,780 @@
+---
+title: "ECON 21100 - R tutorial"
+author: "Wooyong Lee"
+output: github_document
+header-includes:
+- \usepackage{amsfonts,amssymb,amsmath}
+- \usepackage{graphicx}
+- \usepackage{setspace}
+- \usepackage{cleveref}
+---
+
+\newcommand{\beq}{\begin{equation}}
+\newcommand{\eeq}{\end{equation}}
+\newcommand{\beqr}{\begin{eqnarray}}
+\newcommand{\eeqr}{\end{eqnarray}}
+\newcommand{\nn}{\nonumber\\}
+
+\newcommand{\var}{\textrm{Var}}
+\newcommand{\cov}{\textrm{Cov}}
+\newcommand{\corr}{\textrm{Corr}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\pp}{\mathbb{P}}
+\newcommand{\veps}{\varepsilon}
+\newcommand{\diag}{\textrm{diag}}
+
+\newcommand{\by}{\bar Y}
+\newcommand{\bx}{\bar X}
+\newcommand{\beps}{\bar\varepsilon}
+\newcommand{\pt}{\partial}
+
+\newcommand{\tb}{\textbf}
+\newcommand{\ti}{\textit}
+\newcommand{\mb}{\mathbb}
+\newcommand{\mc}{\mathcal}
+\newcommand{\st}{\qquad\text{subject to}\qquad}
+\newcommand{\ra}{\quad\Rightarrow\quad}
+
+\newcommand{\bsni}{\bigskip\noindent}
+
+```{r header, echo=FALSE, message=FALSE, warning=FALSE}
+Sys.setenv(lang="EN")
+```
+
+
+# Basics
+
+## value assignment
+
+Some languages like C requires to specify the type of the variable first and then assign numbers, e.g. `int abc; abc = 2;`. But R does not require such thing. R automatically generates the variable and changes the variable type accordingly.
+
+```{r value assignment}
+# the basic value assignment operator that always works
+abc <- 2 # in this line, R creates the variable "abc" and assigns 2
+abc
+
+# the easy-to-use operator that rarely, but not never, produces error
+abc = 2
+abc
+
+# you can also assign arrays
+abc = c(1,2,3,4,5)
+abc
+
+# assigning the integer sequence
+abc = 1:5
+abc
+
+abc = 3:(-2)
+abc
+
+# you can use the function "rep" to create repeating vectors
+abc = rep(2, 5)
+abc
+
+abc = rep(c(1,2,3), 5)
+abc
+
+# you can use the function "seq" to assign an equispaced sequence
+abc = seq(from=0, to=1, by=0.1)
+abc
+
+abc = seq(from=0, to=1, length=11)
+abc
+```
+
+## writing functions
+
+You can write the custom functions in R easily. The functions do not need to be written in separate files while some languages like Matlab requires to do so.
+
+```{r custom functions}
+# to write a custom function, assign FUNCTION to a VARIABLE
+add = function(x,y) {
+  return(x+y)
+}
+square = function(x) {
+  return(x^2)
+}
+
+# the return statement can be omitted. R returns what is written in the last line.
+square_noreturn = function(x) {
+  x^2
+}
+
+# to call a function, write the name and put arguments inside the bracket
+abc = 3
+add(x=abc, y=2)
+square(x=3)
+square_noreturn(x=3)
+
+# you can omit the labels
+add(abc,2)
+
+# of course you can assign the returned value to a variable
+result = square(abc)
+result
+```
+
+By the way, now we can have better understanding of what we mean by R automatically changes the variable types:
+```{r auto assignment of variable types, error=TRUE}
+# right now, a function is assigned in the variable "add":
+add
+
+# we know it works as a function
+add(abc, 2)
+
+# let's assign a number to "add":
+add = 3;
+add
+
+# then the variable "add" is no longer a function:
+add(abc, 2)
+
+```
+
+## local and parent environment
+
+Consider the following code.
+
+```{r environment, error=TRUE}
+myFunc = function(x) {
+  xSquare = x^2
+  return(xSquare/3)
+}
+myFunc(x = 2)
+
+xSquare
+
+```
+
+We see that `xSquare` is not defined, even though it should have been used in `myFunc`. What happens in R, and in many other programming languages, is the following. When we call `myFunc`, R creates a sub-environment (i.e. a storage space) and define `xSquare` there. Then, when it returns `xSquare/3` and escape `myFunc`, it deletes the sub-environment. Therefore, `xSquare` is not stored anymore.
+
+The sub-environment is like a child of the original environment, and so we call the original one as the parent environment in the perspective of sub-environment. The very top environment is called the global environment.
+
+We call the variables in the current environment as "local variables".
+
+Now consider the following code.
+
+```{r environment2}
+
+myFunc = function(x) {
+  xSquare = x^2
+  return(xSquare/3)
+}
+
+myFunc2 = function(x) {
+  xInverse = 1/x
+  resultMyFunc = myFunc(xInverse)
+  return(resultMyFunc)
+}
+
+myFunc3 = function(x) {
+  xCube = x^3
+  resultMyFunc2 = myFunc2(xCube)
+  return(resultMyFunc2)
+}
+
+myFunc3(x = 2)
+
+```
+
+When we call `myFunc3` in the last line, R creates a sub-environment for `myFunc3`. Then, when `myFunc3` calls `myFunc2` inside `myFunc3`, R creates an environment for `myFunc2` that is a sub-environment of `myFunc3`. Similarly, when `myFunc2` calls `myFunc`, R creates another sub-environment.
+
+When the function creates the sub-environment, it stores the arguments of the function in the environment. In the above example, every environment has `x` variable, although they will all have different values.
+
+How much the sub-environment can access variables in the parent environment is different across languages. In R, the functions can read and change values of the variables in the parent environments.
+
+```{r environment3}
+
+myFuncValue = 0
+
+myFunc5 = function() {
+  print(myFuncValue)
+  myFuncValue = 2
+  
+  myFunc4 = function() {
+    print(myFuncValue)
+    myFuncValue = 1
+    print(myFuncValue)
+  }
+  
+  myFunc4()
+  print(myFuncValue)
+}
+
+myFunc5()
+
+print(myFuncValue)
+
+```
+
+In the above code, `myFuncValue` is present in all of the environments. The function always first search for the local variable when it needs to access the variable.
+
+Now let's see what happens if we define `myFunc4` not in the environment of `myFunc5` but in the global environment.
+
+```{r environment3-2}
+
+myFuncValue = 0
+
+myFunc4 = function() {
+  print(myFuncValue)
+  myFuncValue = 1
+  print(myFuncValue)
+}
+
+myFunc5 = function() {
+  print(myFuncValue)
+  myFuncValue = 2
+  
+  myFunc4()
+  print(myFuncValue)
+}
+
+myFunc5()
+
+print(myFuncValue)
+
+```
+
+
+In R, we can also change the value of the variable in the parent environment using `<<-`.
+
+```{r environment4}
+
+# let's add lines that orders the functions to print variables of parent environments:
+
+xx = 2
+
+myFunc6 = function(x) {
+  xSquare = x^2
+  myFunc7()
+  return(xSquare)
+}
+
+myFunc7 = function() {
+  xx <<- 0
+}
+
+myFunc6(x = xx)
+
+xx
+
+```
+
+However, accessing variables of the parent environment is not recommended, as it is very likely to produce errors and wrong results. If you need to access variables of the parent environment, always pass it to sub-environment by putting them as arguments.
+
+```{r environment5}
+
+a = 2
+b = 3
+
+myFunc8 = function(x) { # not recommended!
+  return(x + a + b)
+}
+
+myFunc9 = function(x,a,b) {
+  return(x + a + b) # as mentioned before, the function will use the "local" a and b.
+}
+
+```
+
+
+## matrix, array and data.frame
+
+There may be other ways, but one way to create a matrix is the following.
+
+```{r matrix, error=TRUE}
+mat = matrix(0, nrow=3, ncol=2)
+mat
+
+sampleArray = c(1,2,3,4,5,6)
+
+mat = matrix(sampleArray, nrow=3, ncol=2)
+mat
+
+mat = matrix(sampleArray, nrow=3, ncol=2, byrow = TRUE)
+mat
+
+# you can access the entries in a usual way.
+# In some languages such as C, the first entry is labeled 0.
+# In R, the first entry is 1.
+mat[1,1]
+mat[3,2]
+mat[0,1]
+
+# you can also access rows or columns
+mat[3,]
+mat[,2]
+
+# you can also call the submatrices
+mat[c(1,2),]
+
+# a useful trick
+mat[c(1,3,3,3,2,1,3),]
+```
+
+The `array` function with 2 dimensions also returns a matrix. It is also useful in producing 3 dimensional arrays.
+
+```{r array}
+arr = array(0, dim = c(3,2))
+arr
+
+arr = array(0, dim = c(3,2,4))
+arr
+```
+
+The `data.frame` is a variable type that handles the datasets.
+```{r data frame}
+ctrs = c("U.S.", "Canada", "Mexico")
+pops = c(318.9, 35.16, 122.3)
+
+# you create a data frame as follows:
+df = data.frame(Country=ctrs, Population=pops)
+df
+```
+
+The `data.frame` is a matrix with the data manipulation capabilities.
+```{r data frame 2}
+# you can access the entries like the matrix
+df[3,2]
+
+# you can also access a column by its name. Use money symbol.
+df$Population
+
+# you can also subset the dataset
+subDF = subset(df, Population >= 100)
+subDF
+
+subDF = subset(df, Population >= 100, select = c("Country"))
+subDF
+```
+
+## data.table
+
+We may use `data.table` intead of `data.frame` in the class. It is an enhancement of `data.frame` which is created by some people in R community.
+
+`data.table` is not automatically installed with base R. We need to install a "package" for `data.table`, which is basically a collection of codes. We install the package in our computer by the following code. R uses internet and downloads the package from the R package database.
+
+```{r datatableInstall, eval=FALSE}
+# the name of the package that allows us to use data.table is "data.table".
+install.packages("data.table")
+```
+
+`install.packages` is more like downloading the package instead of "installing" it. We need to load the package. We load the package by the following code:
+```{r datatableLoad}
+library(data.table)
+```
+
+`data.table` works like `data.frame`.
+```{r datatable}
+# recall:
+ctrs
+pops
+
+# create datatable
+dt = data.table(Country=ctrs, Population=pops)
+dt
+```
+
+We can also transform data.frame into data.table.
+
+```{r datatable2}
+# recall:
+df
+class(df)
+
+# transform.
+dt = as.data.table(df)
+dt
+class(dt)
+
+```
+
+`data.table` has additional features compared to `data.frame`. For example, to subset a data.table, do the following.
+```{r datatable3}
+# subset rows with pop >= 100
+dt[Population >= 100]
+# subset rows but choose the country column only.
+dt[Population >= 100, Country]
+# if you want to be still in the data.table format:
+dt[Population >= 100, list(Country)]
+class(dt[Population >= 100, list(Country)])
+```
+
+We will see other features of `data.table` soon. For more information, look at <https://github.com/Rdatatable/data.table/wiki/Getting-started>, which is a webpage created by the author of `data.table` package.
+
+## list
+
+`list` is a variable type that can store various sub-variables. It is like `struct` in C. 
+```{r list}
+abc = list(a=3, b="John Doe", c=123.456)
+
+# to access the sub-variables, call them using the money symbol:
+abc$a
+abc$b
+abc$c
+```
+
+Inside the `list`, you can save everything as a sub-variable. You can save functions, you can save matrices, you can save a list inside a list, and so on. The following example stores various model primitives of a matching model in Labor economics.
+
+```{r list2}
+# model primitives
+model = list(
+  r = 0.05, # interest rate
+  s = 0.02, # separation rate
+  matchFunc = function(u,v) { 0.4 * u^0.5 * v^0.5 }, # matching function
+  b = 0, # unemployment benefit
+  c = 0, # cost of vacancy
+  alpha = 0.5, # bargaining power
+  prodFunc = function(x,y) { (x^(-2) + y^(-2))^(1/(-2)) + 0.2 } # production function
+)
+```
+
+We can call a function inside the list in a usual way:
+```{r list3}
+model$prodFunc(1,2)
+```
+
+Instead of assigning names to the sub-variables, we can leave the names blank, in which case the serial numbers are assigned.
+```{r list4}
+abc = list(3, "John Doe", 123.456)
+abc
+
+# to access the elements of the list, use the double brackets:
+abc[[1]]
+abc[[2]]
+abc[[3]]
+```
+
+## syntax
+
+If you are familiar with syntax of other languages such as matlab, stata, python, etc., the syntax is very much similar in R. For example, the `for` loop looks like this:
+
+```{r for loop}
+# the canonical for loop with natural numbers
+sum = 0
+for(i in 1:4) {
+  sum = sum + i
+}
+sum
+
+# the loop works for ANY array
+greekLetterArray = c("Alpha", "Beta", "Gamma", "Delta")
+
+for(greekLetter in greekLetterArray) {
+  print(greekLetter)
+}
+
+```
+
+I will not spend time on the syntax, but you can use google to learn how to write a certain syntax, or you can come to the office hour.
+
+
+
+# The plyr package
+
+The `plyr` package is a package for data manipulation. Let's look at how the functions in the `plyr` package are used by example. First, let's take a dataset from the `MASS` package. The `MASS` package is pre-installed in R, and so we can simply load it without installing it.
+
+```{r plyr data}
+library(MASS)
+
+# the MASS package contains a dataset named "Insurance" which is a dataset about the insurance claims.
+Insurance
+
+# of course we can also use data.table
+dtInsurance = as.data.table(Insurance)
+dtInsurance
+
+# some useful functions for looking at the dataset
+head(Insurance, n=5) # you can omit n, in which case it is set to 6.
+tail(Insurance) # ditto
+str(Insurance) # displays structure of the data.frame
+
+```
+
+To begin discussion, let's install `plyr`.
+
+```{r plyr install, eval=FALSE}
+install.packages("plyr")
+```
+
+## summarizing data
+
+The `plyr` package has useful functions that summarize information in `data.frame`. One useful function is `ddply` which can generate various summary statistics of a `data.frame`.
+
+```{r plyr summarizing data}
+# let's load the package
+library(plyr)
+
+# this command computes average number of holders and claims for each district
+ddply(.data = Insurance, .variables = .(District), .fun = summarize, meanHolders=mean(Holders), meanClaims=mean(Claims))
+
+# this command computes total number of holders and claims for each age group
+ddply(.data = Insurance, .variables = .(Age), .fun = summarize, totHolders=sum(Holders), totClaims=sum(Claims))
+
+# we can also summarize numbers for each district+age group:
+ddply(.data = Insurance, .variables = .(District, Age), .fun = summarize, totHolders=sum(Holders), totClaims=sum(Claims))
+
+# also see what happens when we put "mutate" instead of "summarize":
+ddply(.data = Insurance, .variables = .(District, Age), .fun = mutate, totHolders=sum(Holders), totClaims=sum(Claims))
+```
+
+The function `summarize` is a function of the `plyr` package that computes its followed arguments, like `totHolders=sum(Holders), totClaims=sum(Claims)` in the above example, for each subgroup specified in `.variables`.
+
+Of course, you can use functions other than `summarize`. The following example computes the mean absolute deviation for each district.
+
+```{r plyr summarizing data 2}
+# a brute-force way is the following.
+# note that the "ddply" first subsets the data and give the subset to a function as its argument.
+# For example, a subset will look like this:
+subset(Insurance, District == 1)
+
+# and then, this subset becomes the "x" in the following function that we will use:
+computeMAD = function(x) {
+  
+  holderMAD = mean(abs(x$Holders - mean(x$Holders)))
+  return(holderMAD)
+}
+# look at the result of applying the "ddply" function:
+ddply(.data = Insurance, .variables = ~District, .fun = computeMAD)
+
+# if you don't like the "V1" label, we can modify the above code as follows:
+computeMAD = function(x) {
+  
+  holderMAD = mean(abs(x$Holders - mean(x$Holders)))
+  return(data.frame(MADofHolders=holderMAD))
+}
+ddply(.data = Insurance, .variables = ~District, .fun = computeMAD)
+```
+
+The following code seems to return the same result, but we will see the difference later.
+
+```{r plyr summarizing data 3}
+# The same result can be obtained by using "summarize" and a more general function:
+computeMAD = function(x) {
+  mad = mean(abs(x-mean(x)))
+  return(mad)
+}
+
+ddply(.data = Insurance, .variables = ~District, .fun = summarize, MADofHolders=computeMAD(Holders))
+```
+
+`data.table` allows to do the same thing by a simple syntax. The rule is the following:
+
+```{r datatable_ddply, eval=FALSE}
+nameOftheDataTable[,functionToUse,by=groupingVariable]
+```
+
+For example, the following two codes provide the same result.
+
+```{r datatable_ddply2}
+ddply(.data = Insurance, .variables = .(District), .fun = summarize, meanHolders=mean(Holders), meanClaims=mean(Claims))
+
+dtInsurance[,.(meanHolders=mean(Holders), meanClaims=mean(Claims)), by=District]
+```
+
+## transforming data
+
+Sometimes we want to transform the `data.frame` into the `matrix` or the `array` form. This is done by `daply`, where the prefix `da` means transforming `data.frame` to `array`. In fact, the name `ddply` means transformation from `data.frame` to another `data.frame`.
+
+Below is an example of transforming a `data.frame` into a `matrix`.
+```{r plyr daply}
+computeTotHolders = function(x) {
+  return(sum(x$Holders))
+}
+
+result = daply(.data = Insurance, .variables = .(District, Age), .fun = computeTotHolders)
+result
+result[3,2]
+```
+
+Note that the "summarize" function would work badly here. To see why, let's use `summarize`:
+
+```{r plyr daply2}
+result = daply(.data = Insurance, .variables = .(District, Age), .fun = summarize, sum(Holders))
+result
+result[3,2]
+```
+
+Note that `result[3,2]` returned a list with one sub-variable. It is not a number, and so the usual operations will not work:
+```{r plyr daply3, error=TRUE}
+335 + 1
+result[3,2] + 1
+```
+
+Other functions like `adply`, `aaply`, etc. are also useful sometimes, but I skip them here. To see the explanation and the examples of the functions, type `?adply`, `?aaply`, etc., in R. Or, alternatively, type something like `plyr in r` at google, and you will see many webpages that explain how to use `plyr`.
+
+## exporting data.frame - the xtable package
+
+Often, you want to transform a data.frame into the corresponding latex code. There should be many ways to do it, and one way to do it is to use the `xtable` package. First, let's install the package:
+
+```{r xtable install, eval=FALSE}
+install.packages("xtable")
+```
+
+To convert a `data.frame` into a latex code, you do the following.
+```{r xtable export}
+# let's use this data frame as an example.
+sampleDF = ddply(.data = Insurance, .variables = ~District, .fun = summarize, MADofHolders=computeMAD(Holders))
+sampleDF
+
+# load library
+library(xtable)
+
+# use "xtable" function
+xtable(sampleDF)
+
+# the following returns the same result
+print(xtable(sampleDF), type = "latex")
+```
+
+The `xtable` function can also generate an html table.
+```{r xtable exporthtml}
+print(xtable(sampleDF), type = "html")
+```
+
+You can type `?xtable` for more options in this function.
+
+Now we will move to the next topic, an introduction to the `ggplot2` package. 
+
+# The ggplot2 package
+
+The `ggplot2` package is a package for plotting, as its name suggests. What it does is best explained by examples, and so let's look at the examples.
+
+We use the `mtcars` dataset in the `datasets` package which is preinstalled with base R.
+```{r ggplot2 data}
+library(datasets)
+mtcars
+```
+
+Let's start from the scatterplot.
+```{r ggplot2 install, eval=FALSE}
+install.packages("ggplot2")
+```
+
+```{r ggplot2 scatterplot}
+library(ggplot2)
+ggplot(data=mtcars) + geom_point(aes(x=wt,y=mpg))
+```
+
+The `ggplot2` package works by first initializing the plot by `ggplot(data=mtcars)` and then specifying various plotting options by adding functions with a `+`. The `geom_point` function specifies that we want to draw a scatterplot. The `aes` argument specifies the variables that represent the x axis and the y axis. `aes` is an abbreviation for "aesthetics".
+
+We can put more options by adding functions by a `+`. The following example specifies the labels of the x and the y axes.
+
+```{r ggplot2 scatterplot2}
+ggplot(data=mtcars) + geom_point(aes(x=wt,y=mpg)) + xlab("Weight(lb)") + ylab("Miles per gallon")
+```
+
+In order to avoid typing full command every time, the `ggplot2` package allows you to save a plot in a variable and combine the variable with additional options with a `+`.
+```{r ggplot2 scatterplot3}
+gg = ggplot(data=mtcars) + geom_point(aes(x=wt,y=mpg))
+gg
+
+gg + xlab("Weight(lb)") + ylab("Miles per gallon")
+```
+
+Also, you can specify the aesthetics when you initialize ggplot.
+
+```{r ggplot2 scatterplot4}
+gg = ggplot(data=mtcars, aes(x=wt,y=mpg))
+gg + geom_point()
+```
+
+The aesthetics do not only specify the variables but also specify other things.
+
+```{r ggplot2 scatterplot5}
+
+ggplot(data=mtcars) + geom_point(aes(x=wt,y=mpg,color=cyl))
+
+# the function "factor" changes real numbers into categorical variables.
+ggplot(data=mtcars) + geom_point(aes(x=wt,y=mpg,color=factor(cyl)))
+```
+
+The `ggplot2` package has a very detailed online documentation in <http://docs.ggplot2.org/> with tons of examples like the above. For example, look at <http://docs.ggplot2.org/current/geom_point.html> for the documentation of the `geom_point`.
+
+You may feel that the fonts and the legends are too small. In order to change them, you need to modify the theme of the ggplot. You can do it for each plot by `+ theme(...)` (look at the online documentation <http://docs.ggplot2.org/current/theme.html>). To permanently change the theme, use the `theme_update` function:
+
+```{r ggplot2 theme}
+# enlarges ggplot2 font and legend
+theme_update(axis.text=element_text(colour="grey50",size=14),
+             axis.title=element_text(size=14),
+             strip.text=element_text(size=14), # these three lines are for larger axes labels and annotations
+             legend.position="right", # this line specifies the position of the legend
+             legend.key.size=grid::unit(2.5,"lines"),
+             legend.title=element_text(size=14,face="bold"),
+             legend.text=element_text(size=14)) # these three lines are for larger legend texts
+
+ggplot(data=mtcars) + geom_point(aes(x=wt,y=mpg,color=factor(cyl)))
+```
+
+To save your last displayed plot, you can use the `ggsave` function. You can specify the file extension, and DO NOT save in the bitmap image like `.jpg` or `.bmp` since the bitmaps suck when you scale your figures to insert it in your writeup. Save your plot in the vector image like `.pdf`.
+
+```{r ggplot2 save, eval=FALSE}
+# the basic command
+ggsave("myplot.pdf")
+# you can also specify the size.
+ggsave("myplot.pdf", width=8, height=5)
+```
+
+The file will be saved in your "working directory". Before saving the file, specify your working directory by the `setwd` function.
+```{r setwd, eval=FALSE}
+setwd("C:/GoogleDrive/MyWorkingDirectory/")
+```
+
+We finish our session by looking at more `geom_xxx` functions. Once you know the name of the function, you can google `geom_xxx ggplot2` and find the ggplot2 online documentation which explains the function way better than me. 
+
+```{r ggplot2 geom_line}
+ggplot(data=economics) + geom_line(aes(x=date, y=unemploy))
+
+gg = ggplot(data=economics) + geom_line(aes(x=date, y=unemploy), size=1.2) 
+gg + ggtitle("Number of unemployed in the U.S. (in thousands)")
+
+gg + geom_smooth(aes(x=date,y=unemploy))
+gg + geom_smooth(aes(x=date,y=unemploy), method="lm", se=FALSE)
+```
+
+```{r ggplot2 facet_grid}
+gg = ggplot(data = Insurance) + geom_point(aes(Holders, Claims))
+gg
+
+gg + facet_grid(. ~ District) 
+```
+
+```{r ggplot2 scale}
+gg + scale_x_log10() + scale_y_log10()
+
+gg + scale_x_continuous(trans = "log") + scale_y_continuous(trans = "log")
+```
+
+```{r ggplot2 density}
+gg = ggplot(data=mtcars)
+
+gg + geom_density(aes(x=mpg))
+
+gg + geom_density(aes(x=mpg), size=1.2)
+
+gg + geom_density(aes(x=mpg, color=factor(gear)), size=1.2)
+
+gg + geom_density(aes(x=mpg, color=factor(gear), linetype=factor(gear)), size=1.2)
+
+gg + geom_density(aes(x=mpg, color=factor(gear), linetype=factor(gear), fill=factor(gear)), size=1.2)
+
+gg + geom_density(aes(x=mpg, color=factor(gear), linetype=factor(gear), fill=factor(gear)), size=1.2, alpha=0.2)
+```
+
+```{r ggplot2 geom_path}
+gg = ggplot(data=economics) + geom_path(aes(x=unemploy/pop, y=psavert), size=1.2)
+gg
+
+# "geom_hline" does the same thing as "geom_abline" with slope=0.
+gg + geom_abline(intercept = mean(economics$psavert), slope = 0) + geom_vline(xintercept = mean(economics$unemploy/(economics$pop)))
+
+```
+
+
+<!--
+# The foreach and the doParallel package
+-->
+
+
+
