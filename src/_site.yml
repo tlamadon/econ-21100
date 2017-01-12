@@ -7,10 +7,17 @@ navbar:
       icon: fa-home      
       href: index.html
     - text: "Homeworks"
-      icon: fa-pencil     
+      icon: fa-truck     
       menu:
         - text: "Probability"
           href: hw-probability.html
+    - text: "TA notes"
+      icon: fa-paw     
+      menu:
+        - text: "R tutorial"
+          href: Rtutorial.html
+        - text: "R regression"
+          href: Rregression.html
   right:
     - icon: fa-github
       href: https://github.com/tlamadon/econ-21100

@@ -1,7 +1,6 @@
 ---
 title: "ECON 21100 - R regression"
 author: "Wooyong Lee"
-output: github_document
 header-includes:
 - \usepackage{amsfonts,amssymb,amsmath}
 - \usepackage{graphicx}
