@@ -1,0 +1,41 @@
+---
+title: "ECON 21100 - skeleton file for homework"
+author: "Wooyong Lee"
+output: html_document
+header-includes:
+- \usepackage{amsfonts,amssymb,amsmath}
+---
+
+# Big title
+
+## Small title
+
+Pythagorean theorem.
+
+<!-- by using $$ and $$, you can display a math equation -->
+$$
+  a^2 + b^2 = c^2
+$$
+
+<!-- an inline math code is created by $...$ -->
+Arithmetic mean $\geq$ Geometric mean $\geq$ Harmonic mean.
+$$
+  \frac{1}{n}\sum_{i=1}^N X_i \geq \left( \prod_{i=1}^N X_i\right)^{1/N} \geq \frac{1}{\sum_{i=1}^N 1/X_i}.
+$$
+
+Greek letters and multiple lines.
+$$
+  \begin{aligned}
+  line1 &= \alpha + \beta   \\
+  line2 &= \gamma + \delta  \\
+  line3 &= \lambda + \sigma \\
+  line4 &= \Lambda + \Sigma
+  \end{aligned}
+$$
+
+Caligraphic, blackboard bold and bold.
+$$
+  \mathcal{F}, \mathbb{F}, \mathbf{F}.
+$$
+
+To know what is the command of the math symbol that you want to put, just go to http://detexify.kirelabs.org/classify.html, and then draw the symbol using mouse! for example, you can draw $\pm$ and see the command is "pm".
