@@ -1,0 +1,69 @@
+---
+title: "R Notebook"
+output:
+  html_notebook: default
+  html_document: default
+---
+
+Intro to non-parametric regressions.
+
+```{r}
+X = runif(1000);
+Y = 10*((X-0.5)^3 -  0.1*X) + 0.2*rnorm(1000)
+data = data.table(x=X,y=Y,yt=10*((X-0.5)^3 -  0.1*X))
+
+ggplot(data,aes(x=x,y=y)) + geom_point() + geom_line(aes(y=yt),color="red",size=2)
+```
+
+```{r}
+fit = lm(y~x,data)
+data = data[,y_hat := predict(fit)]
+
+ggplot(data,aes(x=x,y=y)) + geom_point() + 
+  geom_line(aes(y=yt),color="red",size=2) + geom_line(aes(y=y_hat),color="blue",size=2)
+```
+
+
+# A simple tree regression
+
+```{r}
+require(rpart)
+fit = rpart(y~x,method="anova",data)
+data[,y_hat_tree := predict(fit)]
+
+ggplot(data,aes(x=x,y=y)) + geom_point() + geom_line(aes(y=yt),color="red",size=2) + geom_line(aes(y=y_hat_tree),color="green",size=2)
+
+```
+
+```{r}
+# plot tree
+plot(fit, uniform=TRUE, main="Classification Tree for Chemicals")
+text(fit, use.n=TRUE, all=TRUE, cex=.8)
+```
+
+# Kernel Estimator
+
+```{r}
+
+g <- function(x0,h) data[, sum( y * dnorm( (x-x0)/h))/sum( dnorm( (x-x0)/h)) ]
+
+data[, y_hat_kern := g(x,0.001),x]
+ggplot(data,aes(x=x,y=y)) + geom_point() + geom_line(aes(y=yt),color="red",size=2) + geom_line(aes(y=y_hat_kern),color="green",size=1)
+
+```
+
+# doing cross-validation
+
+```{r}
+
+g <- function(x0,h) data[, sum( y * dnorm( (x-x0)/h))/sum( dnorm( (x-x0)/h)) ]
+
+
+
+data[, y_hat_kern := g(x,0.001),x]
+ggplot(data,aes(x=x,y=y)) + geom_point() + geom_line(aes(y=yt),color="red",size=2) + geom_line(aes(y=y_hat_kern),color="green",size=1)
+
+```
+
+# Sieve estimator
+
