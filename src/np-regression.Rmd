@@ -91,3 +91,35 @@ ggplot(data,aes(x=x,y=y)) + geom_point(alpha=0.5)  +
 
 # Sieve estimator
 
+Here we use a simple basis function approach.
+
+```{r}
+require(splines)
+n = 10
+D = spline.des(seq(-0.2,1.2,l=n),x = data$x,outer.ok=TRUE)
+
+rr = data.frame(D$design)
+rr$x = data$x
+rr = melt(rr,id.vars = c("x"))
+
+ggplot(rr,aes(x=x,group=variable,y=value)) + geom_line() + theme_bw()
+
+```
+
+```{r}
+# fitting 
+
+fit = lm(data$y ~ D$design)
+data[,y_hat_spline := predict(fit)]
+
+ggplot(data,aes(x=x,y=y)) + geom_point(alpha=0.5)  + 
+  geom_line(aes(y=yt),color="red",size=1,linetype=2) + geom_line(aes(y=y_hat_spline),color="blue",size=1) +  theme_bw() 
+
+
+
+```
+
+
+
+
+
