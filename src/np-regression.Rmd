@@ -1,13 +1,15 @@
 ---
-title: "R Notebook"
+title: "Non-parametric regressions"
 output:
-  html_notebook: default
   html_document: default
 ---
 
 Intro to non-parametric regressions.
 
 ```{r}
+require(ggplot2)
+require(data.table)
+require(reshape2)
 X = runif(1000);
 Y = 10*((X-0.5)^3 -  0.1*X) + 0.2*rnorm(1000)
 data = data.table(x=X,y=Y,yt=10*((X-0.5)^3 -  0.1*X))
@@ -29,7 +31,7 @@ ggplot(data,aes(x=x,y=y)) + geom_point() +
 ```{r}
 require(rpart)
 fit = rpart(y~x,method="anova",data)
-data[,y_hat_tree := predict(fit)]
+data = data[,y_hat_tree := predict(fit)]
 
 ggplot(data,aes(x=x,y=y)) + geom_point() + geom_line(aes(y=yt),color="red",size=2) + 
   geom_line(aes(y=y_hat_tree),color="green",size=2)+theme_bw()
@@ -48,8 +50,8 @@ text(fit, use.n=TRUE, all=TRUE, cex=.8)
 # show one kernel
 
 g <- function(x0,h) data[, sum( y * dnorm( (x-x0)/h))/sum( dnorm( (x-x0)/h)) ]
-data[, kern_val1 := dnorm( (x-0.25)/0.1) ,x]
-data[, kern_val2 := dnorm( (x-0.25)/0.01) ,x]
+data = data[, kern_val1 := dnorm( (x-0.25)/0.1) ,x]
+data = data[, kern_val2 := dnorm( (x-0.25)/0.01) ,x]
 
 ggplot(data,aes(x=x,y=kern_val1)) + geom_line() + geom_point(aes(y=y,alpha=kern_val1)) + theme_bw() 
 ggplot(data,aes(x=x,y=kern_val2)) + geom_line() + geom_point(aes(y=y,alpha=kern_val2)) + theme_bw()
@@ -62,7 +64,7 @@ ggplot(data,aes(x=x,y=kern_val2)) + geom_line() + geom_point(aes(y=y,alpha=kern_
 
 g <- function(x0,h) data[, sum( y * dnorm( (x-x0)/h))/sum( dnorm( (x-x0)/h)) ]
 
-data[, y_hat_kern := g(x,0.001),x]
+data = data[, y_hat_kern := g(x,0.001),x]
 ggplot(data,aes(x=x,y=y)) + geom_point() + geom_line(aes(y=y_hat_kern),color="green",size=1) + geom_line(aes(y=yt),color="red",size=2) + 
    theme_bw()
 
@@ -72,7 +74,7 @@ ggplot(data,aes(x=x,y=y)) + geom_point() + geom_line(aes(y=y_hat_kern),color="gr
 
 ```{r}
 
-data[,i:=1:.N]
+data = data[,i:=1:.N]
 
 g2 <- function(x0,h,ii) data[i!=ii, sum( y * dnorm( (x-x0)/h))/sum( dnorm( (x-x0)/h)) ]
 
@@ -94,7 +96,7 @@ ggplot(data.frame(hs,mse),aes(x=hs,y=mse)) + geom_point() + geom_line() + theme_
 ```{r}
 
 g <- function(x0,h) data[, sum( y * dnorm( (x-x0)/h))/sum( dnorm( (x-x0)/h)) ]
-data[, y_hat_kern := g(x,hstar),x]
+data = data[, y_hat_kern := g(x,hstar),x]
 
 ggplot(data,aes(x=x,y=y)) + geom_point(alpha=0.5)  + 
   geom_line(aes(y=yt),color="red",size=1,linetype=2) + geom_line(aes(y=y_hat_kern),color="blue",size=1) +  theme_bw() 
@@ -124,7 +126,7 @@ ggplot(rr,aes(x=x,group=variable,y=value)) + geom_line() + theme_bw()
 # fitting 
 
 fit = lm(data$y ~ D$design)
-data[,y_hat_spline := predict(fit)]
+data =  data[,y_hat_spline := predict(fit)]
 
 ggplot(data,aes(x=x,y=y)) + geom_point(alpha=0.5)  + 
   geom_line(aes(y=yt),color="red",size=1,linetype=2) + geom_line(aes(y=y_hat_spline),color="blue",size=1) +  theme_bw() 

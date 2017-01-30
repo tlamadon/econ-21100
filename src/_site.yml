@@ -6,6 +6,11 @@ navbar:
     - text: "Home"
       icon: fa-home      
       href: index.html
+    - text: "Notes"
+      icon: fa-book     
+      menu:
+        - text: "no-regression"
+          href: np-regression.html
     - text: "Homeworks"
       icon: fa-truck     
       menu:
