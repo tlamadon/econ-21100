@@ -1,0 +1,93 @@
+---
+title: "R Notebook"
+output:
+  html_notebook: default
+  html_document: default
+---
+
+Intro to non-parametric regressions.
+
+```{r}
+X = runif(1000);
+Y = 10*((X-0.5)^3 -  0.1*X) + 0.2*rnorm(1000)
+data = data.table(x=X,y=Y,yt=10*((X-0.5)^3 -  0.1*X))
+
+ggplot(data,aes(x=x,y=y)) + geom_point() + geom_line(aes(y=yt),color="red",size=2) +theme_bw()
+```
+
+```{r}
+fit = lm(y~x,data)
+data = data[,y_hat := predict(fit)]
+
+ggplot(data,aes(x=x,y=y)) + geom_point() + 
+  geom_line(aes(y=yt),color="red",size=2) + geom_line(aes(y=y_hat),color="blue",size=2) +theme_bw()
+```
+
+
+# A simple tree regression
+
+```{r}
+require(rpart)
+fit = rpart(y~x,method="anova",data)
+data[,y_hat_tree := predict(fit)]
+
+ggplot(data,aes(x=x,y=y)) + geom_point() + geom_line(aes(y=yt),color="red",size=2) + 
+  geom_line(aes(y=y_hat_tree),color="green",size=2)+theme_bw()
+
+```
+
+```{r}
+# plot tree
+plot(fit, uniform=TRUE, main="Classification Tree for Chemicals")
+text(fit, use.n=TRUE, all=TRUE, cex=.8)
+```
+
+# Kernel Estimator
+
+```{r}
+
+g <- function(x0,h) data[, sum( y * dnorm( (x-x0)/h))/sum( dnorm( (x-x0)/h)) ]
+
+data[, y_hat_kern := g(x,0.001),x]
+ggplot(data,aes(x=x,y=y)) + geom_point() + geom_line(aes(y=y_hat_kern),color="green",size=1) + geom_line(aes(y=yt),color="red",size=2) + 
+   theme_bw()
+
+```
+
+# doing cross-validation
+
+```{r}
+
+data[,i:=1:.N]
+
+g2 <- function(x0,h,ii) data[i!=ii, sum( y * dnorm( (x-x0)/h))/sum( dnorm( (x-x0)/h)) ]
+
+# for each point, we estimate the model leaving it out, we then predict the value for that point
+# we then compute the distance with y
+
+mse = rep(0,50)
+hs = seq(0.002,0.05,l=50)
+for (j in 1:50) {
+  data[, y_hat_lo := g2(x,hs[j],i),i]
+  mse[j] = data[,sum((y-y_hat_lo)^2)]
+}
+
+hstar = hs[which.min(mse)] 
+ggplot(data.frame(hs,mse),aes(x=hs,y=mse)) + geom_point() + geom_line() + theme_bw() + geom_vline(xintercept = hstar,color="red",linetype=2)
+
+```
+
+```{r}
+
+g <- function(x0,h) data[, sum( y * dnorm( (x-x0)/h))/sum( dnorm( (x-x0)/h)) ]
+data[, y_hat_kern := g(x,hstar),x]
+
+ggplot(data,aes(x=x,y=y)) + geom_point(alpha=0.5)  + 
+  geom_line(aes(y=yt),color="red",size=1,linetype=2) + geom_line(aes(y=y_hat_kern),color="blue",size=1) +  theme_bw() 
+
+
+
+```
+
+# Sieve estimator
+
