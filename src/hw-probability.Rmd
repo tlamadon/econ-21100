@@ -30,7 +30,7 @@ then you can load the data
 
 we start by computing the wage residuals
 ```{r,results='hide',message=FALSE,warning=FALSE}
-  data[, lwr := log(log_y)]
+  data[, lwr := log_y] # we use raw wages, we could also use the residual from a regression on age, gender, etc...
   # extract one wage per individual
   Y = data[!is.na(lwr), list(lwr = lwr[1] ), person][,lwr]
   hist(Y)
