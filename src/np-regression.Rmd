@@ -45,6 +45,20 @@ text(fit, use.n=TRUE, all=TRUE, cex=.8)
 # Kernel Estimator
 
 ```{r}
+# show one kernel
+
+g <- function(x0,h) data[, sum( y * dnorm( (x-x0)/h))/sum( dnorm( (x-x0)/h)) ]
+data[, kern_val1 := dnorm( (x-0.25)/0.1) ,x]
+data[, kern_val2 := dnorm( (x-0.25)/0.01) ,x]
+
+ggplot(data,aes(x=x,y=kern_val1)) + geom_line() + geom_point(aes(y=y,alpha=kern_val1)) + theme_bw() 
+ggplot(data,aes(x=x,y=kern_val2)) + geom_line() + geom_point(aes(y=y,alpha=kern_val2)) + theme_bw()
+
+```
+
+
+
+```{r}
 
 g <- function(x0,h) data[, sum( y * dnorm( (x-x0)/h))/sum( dnorm( (x-x0)/h)) ]
 
