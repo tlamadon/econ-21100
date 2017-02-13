@@ -9,8 +9,10 @@ navbar:
     - text: "Notes"
       icon: fa-book     
       menu:
-        - text: "no-regression"
+        - text: "np-regression"
           href: np-regression.html
+        - text: "Linear ridge"
+          href: linear-selection.html
     - text: "Homeworks"
       icon: fa-truck     
       menu:
