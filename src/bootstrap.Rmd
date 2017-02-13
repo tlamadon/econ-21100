@@ -1,0 +1,142 @@
+---
+title: "Bootstrap"
+output:
+  html_document: default
+---
+
+Simple Lab on studying bootstrap
+
+```{r}
+require(ggplot2)
+require(data.table)
+require(reshape2)
+require(foreach)
+require(MASS)
+require(stringr)
+library(glmnet)
+
+# let's consider a simple duration model
+lambda = 0.01
+n  = 10
+
+rr = data.table(foreach (i = 1:500,.combine=rbind) %do% {
+  D = rexp(n,lambda)
+  res = data.frame(value=1/mean(D),value0=lambda)
+  res$rep = i
+  res$name = rownames(res)
+  res
+})
+
+ggplot(rr,aes(x=value)) +  geom_density(fill="blue",alpha=0.2,color="blue") + geom_vline(xintercept=lambda,linetype=2,color="red") + geom_vline(xintercept=rr[,mean(value)],linetype=2,color="blue")+theme_bw()
+
+```
+
+# compare bootstrap distribution to asymptotic one
+
+We know that the asymptotic variance is $\lambda^2$ so we can compare the asymptotic distribution approximation to bootstrap distribution.
+
+```{r}
+D = rexp(n,lambda)
+boostest <- function(D) {
+  # we drawn from D with replacement
+  D2 = sample(D,size = n,replace = TRUE)
+  return(1/mean(D2))
+}
+
+rr = data.table(foreach (i = 1:500,.combine=rbind) %do% {
+  D = rexp(n,lambda)
+  res = data.frame(value=1/mean(D),value0=lambda,valueb=mean(valueb))
+  res$rep = i
+  res$name = rownames(res)
+  res
+})
+
+rr[,valueb := boostest(D),rep]
+rr[,valuea := lambda + 1/sqrt(n) * lambda * rnorm(.N)]
+
+ggplot(rr,aes(x=(value-lambda)/lambda)) + geom_density(fill="blue",alpha=0.2,color="blue") +
+  geom_density(aes(x=(valueb-lambda)/lambda),fill="red",alpha=0.2,color="red") + 
+  geom_density(aes(x=(valuea-lambda)/lambda),fill="green",alpha=0.2,color="green") + 
+  geom_vline(xintercept=lambda,linetype=2,color="red") +
+  theme_bw()
+
+```
+
+
+# bootstrapping each time
+
+```{r}
+
+
+boostest <- function(D) {
+  # we drawn from D with replacement
+  D2 = sample(D,size = n,replace = TRUE)
+  return(1/mean(D2))
+}
+
+rr = data.table(foreach (i = 1:500,.combine=rbind) %do% {
+  D = rexp(n,lambda)
+  
+  # compute bootstrap estimates
+  for (j in 1:100) {
+    valueb = boostest(D)
+  }
+  
+  res = data.frame(value=1/mean(D),value0=lambda,valueb=mean(valueb))
+  res$rep = i
+  res$name = rownames(res)
+  res
+})
+
+ggplot(rr,aes(x=value)) + geom_density(fill="blue",alpha=0.2,color="blue") + geom_vline(xintercept=lambda,linetype=2,color="red") + geom_vline(xintercept=rr[,mean(value)],linetype=2,color="blue")+
+geom_vline(xintercept=rr[,mean(valueb)],linetype=2,color="green")+
+geom_vline(xintercept=rr[,2*mean(value) - mean(valueb)],linetype=1,color="orange")+theme_bw()
+
+
+
+```
+
+```{r}
+# looking at the results in this case
+r2 = rs[name %in% paste("X",1:p,sep=""),mean(mse),lambda]
+lambda_star = r2[,{I=which.min(V1);lambda[I]}]
+beta0 = c(beta,rep(0,p2-p))
+
+X = array(rnorm(p2*n),c(n,p2));
+Y = X %*% c(beta,rep(0,p2-p)) + sigma*rnorm(n)
+fit  = lm.ridge(Y~0+X,lambda=lambda_star)
+fit2 = lm.ridge(Y~0+X,lambda=0)
+X = array(rnorm(p2*n),c(n,p2));
+Y = X %*% c(beta,rep(0,p2-p))
+fit3 = lm(Y~0+X)
+
+rr2 = rbind(
+  data.frame(as.list(coef(fit)),name="ridge"),
+  data.frame(as.list(coef(fit2)),name="ols"),
+    data.frame(as.list(coef(fit3)),name="true"))
+rr2$name = paste(rr2$name)
+
+rr3 = melt(rr2,id.vars = "name")
+rr3$var = as.integer(str_replace(rr3$variable,"X",""))
+ggplot(rr3,aes(x=var,y=value,color=name)) + geom_point() + geom_line() + theme_bw()
+
+# add the lasso regression
+X = array(rnorm(p2*n),c(n,p2));
+Y = X %*% c(beta,rep(0,p2-p)) + sigma*rnorm(n)
+cvfit <- glmnet::cv.glmnet(X, Y)
+
+rr2 = rbind(rr2,rr2[1,])
+rr2[4,1:p2] =  as.matrix(coef(cvfit, s = "lambda.1se"))[2:(p2+1)]
+rr2$name[4] <- "lasso"
+
+rr3 = melt(rr2,id.vars = "name")
+rr3$var = as.integer(str_replace(rr3$variable,"X",""))
+rr3$var = rank(-abs(beta0),ties.method = "first" )[rr3$var]
+
+ggplot(rr3,aes(x=var,y=abs(value),color=name)) + geom_point(aes(size=name=="true")) + geom_line() + theme_bw()
+
+
+```
+
+
+
