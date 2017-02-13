@@ -6,13 +6,15 @@ navbar:
     - text: "Home"
       icon: fa-home      
       href: index.html
-    - text: "Notes"
+    - text: "Labs"
       icon: fa-book     
       menu:
         - text: "np-regression"
           href: np-regression.html
         - text: "Linear ridge"
           href: linear-selection.html
+        - text: "Bootstrap"
+          href: bootstrap.html
     - text: "Homeworks"
       icon: fa-truck     
       menu:
