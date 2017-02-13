@@ -20,10 +20,11 @@ p=10
 beta = rnorm(p)
 n  = 20
 p2 = 15
+sigma = 1.5
 
 rr = data.table(foreach (i = 1:500,.combine=rbind) %do% {
   X = array(rnorm(p2*n),c(n,p2));
-  Y = X %*% c(beta,rep(0,p2-p)) + 0.5*rnorm(n)
+  Y = X %*% c(beta,rep(0,p2-p)) + sigma*rnorm(n)
   fit = lm(Y~0+X)
   res = data.frame(value=coef(fit),value0=c(beta,rep(0,p2-p)))
   res$rep = i
@@ -31,11 +32,6 @@ rr = data.table(foreach (i = 1:500,.combine=rbind) %do% {
   res
 })
 
-ggplot(rr,aes(x=name,y=value)) + 
-  stat_summary(geom="point", fun.y=mean, color="red") +
-  stat_summary(geom="ribbon", fun.data=mean_cl_normal, width=0.1, conf.int=0.95, fill="lightblue")
-
-ggplot(data,aes(x=x,y=y)) + geom_point() + geom_line(aes(y=yt),color="red",size=2) +theme_bw()
 ```
 
 # checking the bias and variance
@@ -45,14 +41,15 @@ ggplot(data,aes(x=x,y=y)) + geom_point() + geom_line(aes(y=yt),color="red",size=
 # let's consider a simple model with p independent regressors
 p    = 10
 beta = rnorm(p)
+beta[1] = 1.2
 n    = 20
 p2   = 18
 
 # let's regularize it
 
-rr = data.table( foreach (lambda = seq(0,2,l=20),.combine=rbind) %:% foreach (i = 1:2000,.combine=rbind) %do% {
+rr = data.table( foreach (lambda = seq(0,5,l=20),.combine=rbind) %:% foreach (i = 1:2000,.combine=rbind) %do% {
   X = array(rnorm(p2*n),c(n,p2));
-  Y = X %*% c(beta,rep(0,p2-p)) + 0.5*rnorm(n)
+  Y = X %*% c(beta,rep(0,p2-p)) + sigma*rnorm(n)
   fit = lm.ridge(Y~0+X,lambda=lambda)
   res = data.frame(value=coef(fit),value0=c(beta,rep(0,p2-p)))
   res$rep = i
@@ -63,26 +60,27 @@ rr = data.table( foreach (lambda = seq(0,2,l=20),.combine=rbind) %:% foreach (i 
 
 rs = rr[,list(bias=mean(value-value0)^2,var=var(value-value0),mse=mean((value-value0)^2)),list(name,lambda)]
 ggplot(rs[name=="X1"],aes(x=lambda,y=mse)) + geom_line() + theme_bw() + 
-  geom_line(aes(y=bias),color="red") + geom_line(aes(y=var),color="blue")
+  geom_line(aes(y=bias),color="red") + geom_line(aes(y=var),color="blue") +scale_y_log10()
 
 ls = unique(rr$lambda)[c(1,5,10,15)]
 ggplot(rr[name=="X1"][lambda %in% ls],aes(x=value, group=lambda,fill=lambda,color=lambda)) + 
-  geom_density(alpha=0.3) + geom_vline(xintercept = beta[1],linetype=2) + theme_bw() + xlim(0,3)
-
+  geom_density(alpha=0.3) + geom_vline(xintercept = beta[1],linetype=2) + theme_bw() + xlim(-1,3)
+rr
 ```
 
 ```{r}
 # looking at the results in this case
 r2 = rs[name %in% paste("X",1:p,sep=""),mean(mse),lambda]
 lambda_star = r2[,{I=which.min(V1);lambda[I]}]
+beta0 = c(beta,rep(0,p2-p))
 
 X = array(rnorm(p2*n),c(n,p2));
-Y = X %*% c(beta,rep(0,p2-p)) + 0.5*rnorm(n)
+Y = X %*% c(beta,rep(0,p2-p)) + sigma*rnorm(n)
 fit  = lm.ridge(Y~0+X,lambda=lambda_star)
 fit2 = lm.ridge(Y~0+X,lambda=0)
 X = array(rnorm(p2*n),c(n,p2));
 Y = X %*% c(beta,rep(0,p2-p))
-fit3 = lm.ridge(Y~0+X,lambda=0)
+fit3 = lm(Y~0+X)
 
 rr2 = rbind(
   data.frame(as.list(coef(fit)),name="ridge"),
@@ -95,6 +93,8 @@ rr3$var = as.integer(str_replace(rr3$variable,"X",""))
 ggplot(rr3,aes(x=var,y=value,color=name)) + geom_point() + geom_line() + theme_bw()
 
 # add the lasso regression
+X = array(rnorm(p2*n),c(n,p2));
+Y = X %*% c(beta,rep(0,p2-p)) + sigma*rnorm(n)
 cvfit <- glmnet::cv.glmnet(X, Y)
 
 rr2 = rbind(rr2,rr2[1,])
@@ -103,7 +103,9 @@ rr2$name[4] <- "lasso"
 
 rr3 = melt(rr2,id.vars = "name")
 rr3$var = as.integer(str_replace(rr3$variable,"X",""))
-ggplot(rr3,aes(x=var,y=value,color=name)) + geom_point() + geom_line() + theme_bw()
+rr3$var = rank(-abs(beta0),ties.method = "first" )[rr3$var]
+
+ggplot(rr3,aes(x=var,y=abs(value),color=name)) + geom_point(aes(size=name=="true")) + geom_line() + theme_bw()
 
 
 ```
