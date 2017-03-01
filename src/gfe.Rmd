@@ -1,0 +1,131 @@
+---
+title: "gfe"
+output:
+  html_document: default
+---
+
+Simple Lab studying Fixed Effect
+
+```{r}
+require(ggplot2)
+require(data.table)
+require(reshape2)
+require(foreach)
+require(MASS)
+require(stringr)
+library(glmnet)
+
+# install.packages(c("sp", "maps", "maptools", "mapproj"), dependencies=TRUE)
+# install.packages("deldir", dependencies=TRUE)
+
+
+# consider perectly correlated 2 dimensional heterogeneity
+N = 10000
+A = runif(N);
+A = cbind(4*A,sin(2*pi*A) + 0.7*rnorm(N))
+
+#A = cbind(A,0.2*A + 0.3*rnorm(N))
+
+T  = 10;
+U  = 0.1*array(rnorm(N*T),c(N,T));
+A1 = A[,1] %*% t(rep(1,T));
+A2 = A[,2] %*% t(rep(1,T));
+
+X  = 0.2*A1 + A2 + array(runif(N*T),c(N,T));
+#X  = array(runif(N*T),c(N,T));
+X = rank(X)/(N*T);
+#X = 0.1*scale(X,scale = TRUE,center = TRUE) + 0.5
+
+#ff <- function(X,A1,A2,U) 10*((X-0.5)^3 -  0.1*A2*X) + A1 +  0.2*U
+#ff <- function(X,A1,A2,U)  A1*10*((X-0.5)^3 -  0.1*X) + A2 + 0.2*U
+ff <- function(X,A1,A2,U)  A1*X + A2 + U
+data = data.table(x=as.numeric(X),u=as.numeric(U),
+                  i=kronecker(1:N,rep(1,T)))
+data[, a1 :=A[i,1]]
+data[, a2 :=A[i,2]]
+data[, yt := ff(x,1,0,0)]
+data[, y  := ff(x,a1,a2,u)]
+
+fit  = lm( y ~x,data)
+fit2 = lm( yt~x,data)
+fit3 = lm( y ~0 + I(a2) + I(a1*x) ,data)
+
+rbind(coef(fit),coef(fit2),coef(fit3))
+
+data[,pred1:=predict(fit)]
+data[,pred2:=predict(fit2)]
+
+ggplot(data,aes(x=x,y=y)) + geom_point() + geom_line(aes(y=yt),color="red",size=2) +theme_bw()
+
+#ggplot(data,aes(x=x,y=y)) + geom_point() + geom_line(aes(y=yt),color="red",size=2) +theme_bw()
+
+```
+
+# grouping heterogeneity
+
+```{r}
+require(deldir)
+
+# compute some k-mean groups
+kres = kmeans(A,20,nstart = 100,iter.max = 100)
+
+vtess <- deldir(kres$centers[,1], kres$centers[,2])
+plot(A[,1], A[,2], type="n")
+points(A[,1], A[,2], pch=20, cex=0.5,col="grey")
+points(kres$centers[,1], kres$centers[,2], pch=20, col="red", cex=2)
+plot(vtess, wlines="tess", wpoints="none", number=TRUE, add=TRUE, lty=1)
+
+```
+
+and then estimate within each of these groups
+
+```{r}
+ng = dim(kres$centers)[1]
+data[,grp:=kres$cluster[i]]
+rr = data.frame()
+for (g in 1:ng) {
+  dd.sub = data[grp==g]
+  fit.l = lm( y~x,dd.sub)
+  ma1 = dd.sub[,mean(a1)]
+  ma2 = dd.sub[,mean(a2)]
+  rbind(coef(fit2),coef(fit),coef(fit.l),c( coef(fit.l)[1]/ma2, coef(fit.l)[2]/ma1))
+  rr = rbind(rr,data.frame(grp=g,a0=coef(fit2)[1],b0=coef(fit2)[2],a1= coef(fit.l)[1]/ma2,b1= coef(fit.l)[2]/ma1))
+}
+
+rr
+```
+
+
+
+
+# Grouping outcomes
+
+```{r}
+require(deldir)
+
+# compute some k-mean groups
+data[,t:=1:T,i]
+Y = acast(data,i~t,value.var ="y")
+kres = kmeans(Y,10,nstart = 1000,iter.max = 100)
+
+ng = dim(kres$centers)[1]
+data[,grp:=kres$cluster[i]]
+
+# checking how well the alphas are grouped
+
+ggplot(data,aes(x=grp,y=a1,group=grp)) + geom_boxplot()
+
+
+rr = data.frame()
+for (g in 1:ng) {
+  dd.sub = data[grp==g]
+  fit.l = lm( y~x,dd.sub)
+  ma1 = dd.sub[,mean(a1)]
+  ma2 = dd.sub[,mean(a2)]
+  rbind(coef(fit2),coef(fit),coef(fit.l),c( coef(fit.l)[1]/ma2, coef(fit.l)[2]/ma1))
+  rr = rbind(rr,data.frame(grp=g,a0=coef(fit2)[1],b0=coef(fit2)[2],a1= coef(fit.l)[1]/ma2,b1= coef(fit.l)[2]/ma1))
+}
+
+rr
+```
+
