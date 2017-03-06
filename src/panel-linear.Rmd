@@ -1,0 +1,59 @@
+---
+title: "Linear Panel"
+output:
+  html_document: default
+---
+
+Lab for linaar panel data.
+
+```{r}
+require(ggplot2)
+require(data.table)
+require(reshape2)
+source("utils.R")
+fl <- as.numeric
+
+```
+
+# Omitted variable 
+
+```{r}
+N = 20
+T = 8
+
+A = spread(rnorm(N),2,T)
+U = 0.3*array(rnorm(N*T),c(N,T))
+X = 0.6*array(rnorm(N*T),c(N,T)) - A
+beta = 0.25
+
+sdata = data.table(data.frame(a=fl(A),u=fl(U),x=fl(X),
+                   i=fl(spread(1:N,2,T)),t=fl(spread(1:T,1,N))))
+
+sdata <-  sdata[, y:= beta*x + a + u]
+
+# run the FE estimator
+
+ggplot(sdata,aes(x=x,y=y)) + geom_point(aes(color=factor(i))) + theme_bw()
+
+fit1 = lm(y~x,sdata)
+sdata <- sdata[,yhat1:=predict(fit1)]
+
+ggplot(sdata,aes(x=x,y=y)) + geom_point(aes(color=factor(i))) +
+  theme_bw() +
+  geom_line(aes(y=yhat1),linetype=1,color="red")
+
+fit = lm(y~x+factor(i),sdata)
+sdata <- sdata[,yhat:=predict(fit)]
+
+ggplot(sdata,aes(x=x,y=y)) + geom_point(aes(color=factor(i))) +
+  geom_line(aes(y=yhat1),linetype=1,color="red") + theme_bw() +
+  geom_line(aes(y=yhat,group=factor(i),color=factor(i)))
+
+```
+
+
+# Error in regressor
+
+```{r}
+
+```
