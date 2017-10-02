@@ -1,11 +1,14 @@
-name: "Econ 21100 "
+name: "Econ 21130 "
 output_dir: "../docs"
 navbar:
-  title: "Econ 21100"
+  title: "Econ 21130"
   left:
     - text: "Home"
       icon: fa-home      
       href: index.html
+    - text: "Sched"
+      icon: fa-calendar      
+      href: sched.html
     - text: "Labs"
       icon: fa-book     
       menu:

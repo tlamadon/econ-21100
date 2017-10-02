@@ -47,7 +47,8 @@ Call $F(Y)$ the distribution of wages we recovered from the data. We are intrere
 
 **Question 5**: For each value of $n$ compute the quantiles accross replications and compare them to the quantile of normal distribution. Plot this function on the same graph using ggplot, and show that as $n$ grows, the distribution approches the Normal distribution (recenter and rescale the means within each $n$).
 
-**Question 6**: Finally we want to construct asymptotic confidence interval. This means that for each replication we want to compute two values $a,b$ as function of the drawn sample. Derive the formula for the  $1-\alpha$ asymptotic confidence interval for the mean $\bar{Y}_n$ for $\alpha=0.05$, as a function of the mean and variance of $Y$. For each of your replication, within each $n$ compute this interval. Within $n$ compute the probability across replication the mean paramter (the one from the full sample), is inside the condidence interval. This should be close to $95\%$.
+
+<!-- **Question 6**: Finally we want to construct asymptotic confidence interval. This means that for each replication we want to compute two values $a,b$ as function of the drawn sample. Derive the formula for the  $1-\alpha$ asymptotic confidence interval for the mean $\bar{Y}_n$ for $\alpha=0.05$, as a function of the mean and variance of $Y$. For each of your replication, within each $n$ compute this interval. Within $n$ compute the probability across replication the mean paramter (the one from the full sample), is inside the condidence interval. This should be close to $95\%$. -->
 
 
 

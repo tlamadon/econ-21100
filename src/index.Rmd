@@ -1,29 +1,16 @@
 
 <br/><br/>
-This contains help files for homeworks for _Econ 21100_. The corresponding github repository can be found [here](https://github.com/tlamadon/econ-21100).
-  
+This contains help files for the class _Econ 21130_ at University of Chicago. The corresponding github repository can be found [here](https://github.com/tlamadon/econ-21100), it is shared with my previous class. The class is taught by [T. Lamadon](http://www.lamadon.com). If you are a student, please sign up on the slack group. 
+
+<a class="btn btn-danger" href="https://chicago-econ-21130.slack.com/signup" role="button">Slack group</a>  <a class="btn btn-info" href="pdf/syllabus" role="button">Syllabus</a> <a class="btn btn-warning" href="pdf/econ-21130-notes.pdf" role="button">Notes</a>
+
+
 <!-- Place this tag where you want the button to render. -->
 <a class="github-button" href="https://github.com/tlamadon/econ-21100/archive/master.zip" data-icon="octicon-cloud-download" data-style="mega" aria-label="Download tlamadon/econ-21100 on GitHub">Download</a>  <a class="github-button" href="https://github.com/tlamadon/econ-21100/fork" data-icon="octicon-repo-forked" data-style="mega" data-count-href="/tlamadon/econ-21100/network" data-count-api="/repos/tlamadon/econ-21100#forks_count" data-count-aria-label="# forks on GitHub" aria-label="Fork tlamadon/econ-21100 on GitHub">Fork</a>
 
-## Class content
+## Class overview
 
-  -	Review
-    -	Probability Refresher
-    -	Model Identification, Estimation & Inference
-    -	Review of OLS, IV
-  -	Linear Panel Data with applications
-    -	Controlling for unobserved heterogeneity
-    -	Measurement error
-    -	Clustering of standard errors
-  -	Maximum likelihood estimators
-    -	Inference
-    -	Latent heterogeneity, the EM algorithm
-    -	Discrete choices & Mixtures
-  -	Advanced Topics
-    -	Resampling methods
-    -	Bayesian Inference 
-    -	Model selection and regularization
-    -	Bipartite data: Two-way fixed effects 
+This course focuses on micro-econometric methods that have applications to a wide range of economic questions. We study identification, estimation, and inference in both parametric and non-parametric models and consider aspects such as consistency, bias and variance of estimators. We discuss how repeated measurements can help with problems related to unobserved heterogeneity and measurement error, and how they can be applied to panel and network data. Topics include duration models, regressions with a large number of covariates, non-parametric regressions, and dynamic discrete choice models. Applications include labor questions such as labor supply, wage inequality decompositions and matching between workers and firms.  Students will be expected to solve programming assignment in R.
 
 ## Getting started with R {#start}
 
