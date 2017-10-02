@@ -1,5 +1,5 @@
 ---
-title: "ECON 21100 - R tutorial"
+title: "ECON 21130 - R tutorial"
 author: "Wooyong Lee"
 header-includes:
 - \usepackage{amsfonts,amssymb,amsmath}
@@ -103,7 +103,7 @@ square = function(x) {
 }
 
 # the return statement can be omitted. R returns what is written in the last line.
-square_noreturn = function(x) {
+square_noReturnStatement = function(x) {
   x^2
 }
 
@@ -111,7 +111,7 @@ square_noreturn = function(x) {
 abc = 3
 add(x=abc, y=2)
 square(x=3)
-square_noreturn(x=3)
+square_noReturnStatement(x=3)
 
 # you can omit the labels
 add(abc,2)
@@ -121,7 +121,7 @@ result = square(abc)
 result
 ```
 
-By the way, now we can have better understanding of what we mean by R automatically changes the variable types:
+By the way, now we can have better understanding of what we mean by R automatically changing the variable types:
 ```{r auto assignment of variable types, error=TRUE}
 # right now, a function is assigned in the variable "add":
 add
@@ -147,8 +147,8 @@ myFunc = function(x) {
   xSquare = x^2
   return(xSquare/3)
 }
-myFunc(x = 2)
 
+myFunc(x = 2)
 xSquare
 
 ```
@@ -184,7 +184,7 @@ myFunc3(x = 2)
 
 ```
 
-When we call `myFunc3` in the last line, R creates a sub-environment for `myFunc3`. Then, when `myFunc3` calls `myFunc2` inside `myFunc3`, R creates an environment for `myFunc2` that is a sub-environment of `myFunc3`. Similarly, when `myFunc2` calls `myFunc`, R creates another sub-environment.
+When we call `myFunc3` in the last line, R creates a sub-environment for `myFunc3`. Then, when `myFunc3` calls `myFunc2` within its code, R creates an environment for `myFunc2` that is a sub-environment of `myFunc3`. Similarly, when `myFunc2` calls `myFunc`, R creates another sub-environment.
 
 When the function creates the sub-environment, it stores the arguments of the function in the environment. In the above example, every environment has `x` variable, although they will all have different values.
 
@@ -195,10 +195,12 @@ How much the sub-environment can access variables in the parent environment is d
 myFuncValue = 0
 
 myFunc5 = function() {
+  
   print(myFuncValue)
   myFuncValue = 2
   
   myFunc4 = function() {
+    
     print(myFuncValue)
     myFuncValue = 1
     print(myFuncValue)
@@ -209,7 +211,6 @@ myFunc5 = function() {
 }
 
 myFunc5()
-
 print(myFuncValue)
 
 ```
@@ -223,12 +224,14 @@ Now let's see what happens if we define `myFunc4` not in the environment of `myF
 myFuncValue = 0
 
 myFunc4 = function() {
+  
   print(myFuncValue)
   myFuncValue = 1
   print(myFuncValue)
 }
 
 myFunc5 = function() {
+  
   print(myFuncValue)
   myFuncValue = 2
   
@@ -237,11 +240,9 @@ myFunc5 = function() {
 }
 
 myFunc5()
-
 print(myFuncValue)
 
 ```
-
 
 In R, we can also change the value of the variable in the parent environment using `<<-`.
 
@@ -357,7 +358,7 @@ subDF
 
 ## data.table
 
-We may use `data.table` intead of `data.frame` in the class. It is an enhancement of `data.frame` which is created by some people in R community.
+We may use `data.table` intead of `data.frame` in the class. It is an enhancement of `data.frame` which is created by contributors of R community.
 
 `data.table` is not automatically installed with base R. We need to install a "package" for `data.table`, which is basically a collection of codes. We install the package in our computer by the following code. R uses internet and downloads the package from the R package database.
 
@@ -366,12 +367,13 @@ We may use `data.table` intead of `data.frame` in the class. It is an enhancemen
 install.packages("data.table")
 ```
 
-`install.packages` is more like downloading the package instead of "installing" it. We need to load the package. We load the package by the following code:
+Now we have installed the package. As we do when we install and use computer programs like MS Office, We need to "execute" or "load" the package to use it. We load the package by the following code:
+
 ```{r datatableLoad}
 library(data.table)
 ```
 
-`data.table` works like `data.frame`.
+Now we discuss how `data.frame` works. It works like `data.frame`.
 ```{r datatable}
 # recall:
 ctrs
@@ -541,6 +543,7 @@ computeMAD = function(x) {
   holderMAD = mean(abs(x$Holders - mean(x$Holders)))
   return(holderMAD)
 }
+
 # look at the result of applying the "ddply" function:
 ddply(.data = Insurance, .variables = ~District, .fun = computeMAD)
 
@@ -584,6 +587,7 @@ dtInsurance[,.(meanHolders=mean(Holders), meanClaims=mean(Claims)), by=District]
 Sometimes we want to transform the `data.frame` into the `matrix` or the `array` form. This is done by `daply`, where the prefix `da` means transforming `data.frame` to `array`. In fact, the name `ddply` means transformation from `data.frame` to another `data.frame`.
 
 Below is an example of transforming a `data.frame` into a `matrix`.
+
 ```{r plyr daply}
 computeTotHolders = function(x) {
   return(sum(x$Holders))
@@ -672,6 +676,7 @@ ggplot(data=mtcars) + geom_point(aes(x=wt,y=mpg)) + xlab("Weight(lb)") + ylab("M
 ```
 
 In order to avoid typing full command every time, the `ggplot2` package allows you to save a plot in a variable and combine the variable with additional options with a `+`.
+
 ```{r ggplot2 scatterplot3}
 gg = ggplot(data=mtcars) + geom_point(aes(x=wt,y=mpg))
 gg
