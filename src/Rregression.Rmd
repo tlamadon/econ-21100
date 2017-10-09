@@ -1,5 +1,5 @@
 ---
-title: "ECON 21100 - R regression"
+title: "ECON 21130 - R regression"
 author: "Wooyong Lee"
 header-includes:
 - \usepackage{amsfonts,amssymb,amsmath}
