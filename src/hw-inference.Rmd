@@ -18,6 +18,7 @@ output:
 
 ## Computer Question 
 
+
 ```{r,message=FALSE}
 require(kableExtra)
 require(ggplot2)
@@ -25,11 +26,19 @@ require(texreg)
 options(knitr.table.format = "html") 
 ```
 
-We are going to reproduce an exerice similar to the example for the computation of standard error.  Start by downloading the CPS data from [here](http://cameron.econ.ucdavis.edu/research/cameron_miller_JHR_files%20to%20share.zip). For this part load the 
+We are going to reproduce an exerice similar to the example for the computation of standard error.  Start by downloading the CPS data from [here](http://cameron.econ.ucdavis.edu/research/cameron_miller_JHR_files%20to%20share.zip). 
+
+Here is some relevant material:
+
+ - [Econometric Computing with HC and HAC Covariance Matrix Estimators](https://cran.r-project.org/web/packages/sandwich/vignettes/sandwich.pdf)
+ - R [sandwich](https://cran.r-project.org/web/packages/sandwich/index.html) package
+
+For this part load the data.
 
 ```{r}
 require(readstata13) #to install, run install.packages("readstata13")
-data = read.dta13("/Users/thibautlamadon/Downloads/files to share/CPS_2012_micro.dta")
+require(sandwich)
+data = read.dta13("/Users/lamadon/Downloads/files to share/CPS_2012_micro.dta")
 data = data.table(data)
 data$age = as.numeric(data$age)
 ```
@@ -46,17 +55,37 @@ Now this is surprising. To gain understanding on what is happening we will use t
 
 ### Classical DGP
 
-Let's start by reassuring outselves. Let's use an IID dgg, run the regression and check the significance.
+Let's start by reassuring ourselves. Let's use an IID dgp, run the regression and check the significance.
 
- - regress without using `fp` variable, then use the `predict command` to get predicted value
- - compute an "homoskedastic" s.e. for the residuals by taking the variance of the residuals
- - simulate a fake outcome by adding a truly i.i.d. normal error to your predicted value
- - run the regression including `fp` and collect its coefficient
- - run the last steps 500 times and compute the quantiles of the regression coefficient
+ 1. regress without using `fp` variable, then use the `predict command` to get predicted value
+ 2. estimate an "homoskedastic" s.e. for the residuals by taking the variance of the residuals
+ 3. simulate a fake outcome by adding a truly i.i.d. normal error to your predicted value
+ 4. run the regression including `fp` and collect its coefficient, also save if the coefficient is significant at 5%
+ 5. run the last steps 500 times 
+ 
+<span class="label label-warning">Question 1</span> follow the previous steps and report the rejection rate of the test on `fp`. You should find something close to 5% and you should feel better!
+
+<span class="label label-danger">Question 2</span> construct the variance covariance matrix by hand. To do this we extract the matrix of regressors, and in this case we assume homoskedasticity.
+
+```{r,eval=FALSE}
+XX  = model.matrix(fit1)  # extract design matrix
+eps = residuals(fit1)     # extract residuals
+VV  = ...  # << compute the Variance matrix of the parameters, 
+VV[colnames(XX)=="fpTRUE"]      # << extract the coeff for fp
+```
+
+The result should very similar to using `vcovHC` from the sandwish package with the option `type="const"`.
 
 ### Heteroskedastic $\Omega$
 
-First we want to compute heteroskedastic robust standard errors. 
+Now we want to compute heteroskedastic robust standard errors. We then want to repeat the previous procedure, but we are going to use a different test for the significance. For this we want to recover the design matrix and the residuals and compute the asymptotic variance ourselves. Given that we have already extracted the design matrix and the residuals. We then want to construct our variance co-variance matrix using the following formula:
+
+$$ V =(X'X)^{-1} X' \Omega X' (X'X)^{-1} $$
+where $ \Omega = diag \{ \epsilon_i^2 \} $
+
+**Question 3**: Construct the heteroskedsastic variance matrix. Then report the standard error on `fp`. Compare this value to the value returned using `vcovHC` with `type="HC0"`.
+
+  
 
 ### State clustered $\Omega$
 
