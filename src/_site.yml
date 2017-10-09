@@ -21,8 +21,10 @@ navbar:
     - text: "Homeworks"
       icon: fa-truck     
       menu:
-        - text: "Probability"
+        - text: "1 Probability"
           href: hw-probability.html
+        - text: "2 Inference"
+          href: hw-inference.html
     - text: "TA notes"
       icon: fa-paw     
       menu:

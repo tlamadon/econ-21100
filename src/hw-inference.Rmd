@@ -12,17 +12,19 @@ output:
 
 ## Analytical questions
 
-**Question 1**: Show that the ols model $Y_i = \beta X_i + \epsilon_i$ is identified when $E(x\epsilon)=0$ and $var(x)>0$.
+<span class="label label-success">Question 1</span> Show that the univariate ols model $y_i = \beta x_i + \epsilon_i$ is identified when $E(x\epsilon)=0$ and $var(x)>0$.
 
-**Question 2**: Derive the bias of the sample variance.
+<span class="label label-success">Question 2</span> Derive the bias of the sample variance.
 
 ## Computer Question 
 
 
-```{r,message=FALSE}
+```{r,message=FALSE,warning=FALSE}
 require(kableExtra)
 require(ggplot2)
 require(texreg)
+require(readstata13) #to install, run install.packages("readstata13")
+require(sandwich)
 options(knitr.table.format = "html") 
 ```
 
@@ -36,8 +38,6 @@ Here is some relevant material:
 For this part load the data.
 
 ```{r}
-require(readstata13) #to install, run install.packages("readstata13")
-require(sandwich)
 data = read.dta13("/Users/lamadon/Downloads/files to share/CPS_2012_micro.dta")
 data = data.table(data)
 data$age = as.numeric(data$age)
@@ -46,14 +46,14 @@ data$age = as.numeric(data$age)
 Next generate a fictuous policy that you randomly assigned at the state level. Run the regression and report standard errors given by R for one draw of the poilcy.
 
 ```{r,results='asis'}
-data <- data[,fp := runif(1)>0.5, statefip]
+data <- data[,fp := rnorm(1), statefip]
 fit1 = lm(lnwage ~ fp + yrseduc + age + I(age^2) + statefip ,data)
 htmlreg(fit1,single.row=TRUE,omit.coef="state")
 ```
 
 Now this is surprising. To gain understanding on what is happening we will use the real data, but we will also generate our own data in a where we control exactly what is happening.
 
-### Classical DGP
+### IID errors
 
 Let's start by reassuring ourselves. Let's use an IID dgp, run the regression and check the significance.
 
@@ -63,9 +63,9 @@ Let's start by reassuring ourselves. Let's use an IID dgp, run the regression an
  4. run the regression including `fp` and collect its coefficient, also save if the coefficient is significant at 5%
  5. run the last steps 500 times 
  
-<span class="label label-warning">Question 1</span> follow the previous steps and report the rejection rate of the test on `fp`. You should find something close to 5% and you should feel better!
+<span class="label label-success">Question 3</span> follow the previous steps and report the rejection rate of the test on `fp`. You should find something close to 5% and you should feel better!
 
-<span class="label label-danger">Question 2</span> construct the variance covariance matrix by hand. To do this we extract the matrix of regressors, and in this case we assume homoskedasticity.
+<span class="label label-success">Question 4</span> construct the variance covariance matrix by hand. To do this we extract the matrix of regressors, and in this case we assume homoskedasticity.
 
 ```{r,eval=FALSE}
 XX  = model.matrix(fit1)  # extract design matrix
@@ -76,23 +76,67 @@ VV[colnames(XX)=="fpTRUE"]      # << extract the coeff for fp
 
 The result should very similar to using `vcovHC` from the sandwish package with the option `type="const"`.
 
-### Heteroskedastic $\Omega$
+### Heteroskedastic errors
 
 Now we want to compute heteroskedastic robust standard errors. We then want to repeat the previous procedure, but we are going to use a different test for the significance. For this we want to recover the design matrix and the residuals and compute the asymptotic variance ourselves. Given that we have already extracted the design matrix and the residuals. We then want to construct our variance co-variance matrix using the following formula:
 
 $$ V =(X'X)^{-1} X' \Omega X' (X'X)^{-1} $$
-where $ \Omega = diag \{ \epsilon_i^2 \} $
+where $\Omega = diag \{ \epsilon_i^2 \}$
 
-**Question 3**: Construct the heteroskedsastic variance matrix. Then report the standard error on `fp`. Compare this value to the value returned using `vcovHC` with `type="HC0"`.
+<span class="label label-success">Question 5</span> Construct the heteroskedsastic variance matrix. Then report the standard error on `fp`. Compare this value to the value returned using `vcovHC` with `type="HC0"`.
 
+We want to check this by simulating from a model with heteroskedesatic errors. To do so we are going to use linear model for the variance.
+
+ 1. using residuals from `fit1`, regress the square of the residual on the same co-variates as previously
+ 2. predict the value of the sqaure residual at for each individual, store this as  new variable `s`
+ 3. when simulating data, drawn normal residuals and multiply it by individual specific variance
+ 4. replicate this 500 times, evaluate the significance of `fp` using vcovHC with type `type="const"` and `type="HC0"`
+
+<span class="label label-success">Question 6</span> Report the rejection rate for each of the variance evaluation.
   
+### State clustered errors
 
-### State clustered $\Omega$
+We are again here going to try to simulate corrolated error within state. For this we pick a correlation parameter $\rho$. Then so simulate we are going to draw the first individual in an iid way, then using an auto-regressive structure to compute the error of the following people. Given $\rho$ it can be done in the following way:
 
-### Boostrap at the state level
+```{r,results='asis'}
+fit0  = lm(lnwage ~ yrseduc + age + I(age^2) + statefip,data)
+data[,yhat := predict(fit0)]
+rho = 0.7
+data[, res_hat := {
+  r = rep(0,.N)
+  r[1] = rnorm(1)
+  for (i in 2:.N) {
+    r[i] = rho*r[i-1] + rnorm(1)
+  }
+  r
+},statefip]
+data[,y2:= yhat + res_hat]
+data[,fp:=rnorm(1),statefip]
 
+fitn = lm(y2 ~ fp+yrseduc + age + I(age^2) + statefip,data)
+htmlreg(fitn,single.row=TRUE,omit.coef="state")
 
+```
 
+<span class="label label-success">Question 7</span> Explain the expression that starts with `data[, res_hat := {...`
+
+<span class="label label-success">Question 8</span> For $\rho=0.1,0.2,...,0.9$ run 500 replications and report the proportion at each value of replication for which the coefficient on our ficutous policy was significant at 5%.
+
+### State level bootstrap
+
+We have not covered this in class yet, but one could instead try to resample the data.
+
+Use the following procedure:
+
+  1. Draw from the 51 states (at the state level) with replacement
+  2. Create a dataset from the actual data, appending the observations for each of the state 
+    - when a state appears multiple times, attach the data of that state, but treat these states as different. In other words the names of the states in this synthetic data set should just be 1,2,3,4...51.
+  3. compute the regression on this synthetic data set
+  4. store the resulting regression coeffecient for each repetition, repeat 500 times.
+  
+**help:** do not redraw `fp`!
+  
+<span class="label label-success">Question 9</span> Report the 0.025 and 0.0975 quantiles for the regression coefficients. Does this interval include 0?
 
 
 
