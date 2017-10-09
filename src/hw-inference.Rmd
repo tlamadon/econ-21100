@@ -1,0 +1,70 @@
+---
+title: "Homework on Inference"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+---
+
+## Analytical questions
+
+**Question 1**: Show that the ols model $Y_i = \beta X_i + \epsilon_i$ is identified when $E(x\epsilon)=0$ and $var(x)>0$.
+
+**Question 2**: Derive the bias of the sample variance.
+
+## Computer Question 
+
+```{r,message=FALSE}
+require(kableExtra)
+require(ggplot2)
+require(texreg)
+options(knitr.table.format = "html") 
+```
+
+We are going to reproduce an exerice similar to the example for the computation of standard error.  Start by downloading the CPS data from [here](http://cameron.econ.ucdavis.edu/research/cameron_miller_JHR_files%20to%20share.zip). For this part load the 
+
+```{r}
+require(readstata13) #to install, run install.packages("readstata13")
+data = read.dta13("/Users/thibautlamadon/Downloads/files to share/CPS_2012_micro.dta")
+data = data.table(data)
+data$age = as.numeric(data$age)
+```
+
+Next generate a fictuous policy that you randomly assigned at the state level. Run the regression and report standard errors given by R for one draw of the poilcy.
+
+```{r,results='asis'}
+data <- data[,fp := runif(1)>0.5, statefip]
+fit1 = lm(lnwage ~ fp + yrseduc + age + I(age^2) + statefip ,data)
+htmlreg(fit1,single.row=TRUE,omit.coef="state")
+```
+
+Now this is surprising. To gain understanding on what is happening we will use the real data, but we will also generate our own data in a where we control exactly what is happening.
+
+### Classical DGP
+
+Let's start by reassuring outselves. Let's use an IID dgg, run the regression and check the significance.
+
+ - regress without using `fp` variable, then use the `predict command` to get predicted value
+ - compute an "homoskedastic" s.e. for the residuals by taking the variance of the residuals
+ - simulate a fake outcome by adding a truly i.i.d. normal error to your predicted value
+ - run the regression including `fp` and collect its coefficient
+ - run the last steps 500 times and compute the quantiles of the regression coefficient
+
+### Heteroskedastic $\Omega$
+
+First we want to compute heteroskedastic robust standard errors. 
+
+### State clustered $\Omega$
+
+### Boostrap at the state level
+
+
+
+
+
+
+
