@@ -1,0 +1,34 @@
+---
+title: "Homework 2"
+output: html_document
+---
+
+In this homework we are going to investigate an insurance problem. Think of yourself as an entrepreneur that wants to offer insurance against some event to a group of customers.
+
+Customers differ in their observable $X$ which is continuous and linked to their risk factor. Individual incur a yearly medical spending which is randomly distributed $C$. We are interested in Moreover individuals are risk averse, meaning that they dislike uncertainty. Their preferences other the state of the world if giben by:
+
+$$ E u(w) $$
+
+You are provided with data on $X$ and the outcome $D$. 
+
+# Demand analysis
+
+We are going to start by estimating the probability of the event $P(D=1|X)$ where the true model is given by $P(D=1|X)=Pr[ g(x)<= u]$ for a uniform random variable $u$ and some function $g(x)$. When $g(x)$ is the CDF of a normal distribution, we are in the presence of probit model.
+
+
+```{r}
+require(data.table)
+require(ggplot2)
+# we use true probability P(x) = x^-\alpha
+N =1000
+data = data.table(x = exp(rnorm(N)))
+data = data[,p:= (0.5+x)^(-0.5)]
+data = data[,d := p > runif(N)]
+# we then fit something different
+
+fit = glm(d ~ x,family = binomial('probit'),data)
+data = data[,p_hat := predict(fit,type="response")]
+
+ggplot(data,aes(x,y=p)) + geom_line() + geom_line(aes(y=p_hat),color="blue") + theme_bw()
+
+```

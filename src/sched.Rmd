@@ -9,11 +9,11 @@ You can download the notes for the class: <a class="btn btn-warning" href="pdf/e
 
  - week 1: Probability review (see notes section 1) 
  - week 2: Models, parameters and estimation (see notes section 2) 
- - week 3: OLS refresher (see notes section 3) 
+ - week 3: OLS refresher (see notes section 3), clustered standard errors [paper <i class="fa fa-external-link" aria-hidden="true"></i>](http://cameron.econ.ucdavis.edu/research/Cameron_Miller_JHR_2015_February.pdf)
  - week 4: Maximum Likelihood, Multinomial choice (see notes section 4), Monosponic fim application  
- - week 5: Dynamic discrete choice (see notes section 4), Bus engine application [Rust87](http://people.hss.caltech.edu/~mshum/stats/rust.pdf)
+ - week 5: Dynamic discrete choice (see notes section 4), Bus engine application [Rust87 <i class="fa fa-external-link" aria-hidden="true"></i>](http://people.hss.caltech.edu/~mshum/stats/rust.pdf)
  - week 5: Regression with many regressors (see notes section 5) & [Lab](http://econ21130.lamadon.com/linear-selection.html) 
- - week 6: Application Lasso and peer effects [Manresa17](https://www.dropbox.com/s/erc8gr4yo0favyx/Manresa_2016_final.pdf?dl=0)
+ - week 6: Application Lasso and peer effects [Manresa17 <i class="fa fa-external-link" aria-hidden="true"></i>](https://www.dropbox.com/s/erc8gr4yo0favyx/Manresa_2016_final.pdf?dl=0)
  - week 7: Non parametric regression (see notes section 6) & [Lab](http://econ21130.lamadon.com/np-regression.html)  
  - week 8: Heterogeneity, random effect model and EM algorithm (see notes section 9) 
  - week 9: Heterogeneity, fixed effect models (see notes section 10) 

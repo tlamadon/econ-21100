@@ -1,0 +1,98 @@
+---
+title: "Hazard"
+output:
+  html_document: default
+---
+
+Simple Lab on studying hazard rate modeling
+
+```{r}
+require(ggplot2)
+require(data.table)
+require(reshape2)
+require(foreach)
+require(MASS)
+require(stringr)
+library(glmnet)
+
+# let's consider a simple duration model
+lambda = 0.01
+n  = 10
+
+rr = data.table(foreach (i = 1:500,.combine=rbind) %do% {
+  D = rexp(n,lambda)
+  res = data.frame(value=1/mean(D),value0=lambda)
+  res$rep = i
+  res$name = rownames(res)
+  res
+})
+
+ggplot(rr,aes(x=value)) +  geom_density(fill="blue",alpha=0.2,color="blue") + geom_vline(xintercept=lambda,linetype=2,color="red") + geom_vline(xintercept=rr[,mean(value)],linetype=2,color="blue")+theme_bw()
+
+```
+
+# compare bootstrap distribution to asymptotic one
+
+We know that the asymptotic variance is $\lambda^2$ so we can compare the asymptotic distribution approximation to bootstrap distribution.
+
+```{r}
+D = rexp(n,lambda)
+boostest <- function(D) {
+  # we drawn from D with replacement
+  D2 = sample(D,size = n,replace = TRUE)
+  return(1/mean(D2))
+}
+
+rr = data.table(foreach (i = 1:500,.combine=rbind) %do% {
+  D = rexp(n,lambda)
+  res = data.frame(value=1/mean(D),value0=lambda)
+  res$rep = i
+  res$name = rownames(res)
+  res
+})
+
+rr[,valueb := boostest(D),rep]
+rr[,valuea := lambda + 1/sqrt(n) * lambda * rnorm(.N)]
+
+ggplot(rr,aes(x=(value-lambda)/lambda)) + geom_density(fill="blue",alpha=0.2,color="blue") +
+  geom_density(aes(x=(valueb-lambda)/lambda),fill="red",alpha=0.2,color="red") + 
+  geom_density(aes(x=(valuea-lambda)/lambda),fill="green",alpha=0.2,color="green") + 
+  geom_vline(xintercept=lambda,linetype=2,color="red") +
+  theme_bw()
+
+```
+
+
+# bootstrapping each time
+
+```{r}
+
+
+boostest <- function(D) {
+  # we drawn from D with replacement
+  D2 = sample(D,size = n,replace = TRUE)
+  return(1/mean(D2))
+}
+
+rr = data.table(foreach (i = 1:500,.combine=rbind) %do% {
+  D = rexp(n,lambda)
+  valueb = rep(0,100)
+  # compute bootstrap estimates
+  for (j in 1:100) {
+    valueb[j] = boostest(D)
+  }
+  
+  res = data.frame(value=1/mean(D),value0=lambda,valueb=mean(valueb))
+  res$rep = i
+  res$name = rownames(res)
+  res
+})
+
+ggplot(rr,aes(x=value)) + geom_density(fill="blue",alpha=0.2,color="blue") + geom_vline(xintercept=lambda,linetype=2,color="red") + geom_vline(xintercept=rr[,mean(value)],linetype=2,color="blue")+
+geom_vline(xintercept=rr[,mean(valueb)],linetype=2,color="green")+
+geom_vline(xintercept=rr[,2*mean(value) - mean(valueb)],linetype=1,color="orange")+theme_bw()
+
+
+
+```
+
