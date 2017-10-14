@@ -28,7 +28,7 @@ require(sandwich)
 options(knitr.table.format = "html") 
 ```
 
-We are going to reproduce an exerice similar to the example for the computation of standard error.  Start by downloading the CPS data from [here](http://cameron.econ.ucdavis.edu/research/cameron_miller_JHR_files%20to%20share.zip). 
+We are going to reproduce an exercise similar to the example for the computation of standard error.  Start by downloading the CPS data from [here](http://cameron.econ.ucdavis.edu/research/cameron_miller_JHR_files%20to%20share.zip). 
 
 Here is some relevant material:
 
@@ -38,20 +38,29 @@ Here is some relevant material:
 For this part load the data.
 
 ```{r}
-data = read.dta13("/Users/lamadon/Downloads/files to share/CPS_2012_micro.dta")
+data = read.dta13("~/Downloads/files to share/CPS_2012_micro.dta")
 data = data.table(data)
 data$age = as.numeric(data$age)
 ```
 
-Next generate a fictuous policy that you randomly assigned at the state level. Run the regression and report standard errors given by R for one draw of the poilcy.
+Next generate a fictuous policy that you randomly assigned at the state times gender level. Run the regression and report standard errors given by R for one draw of the poilcy.
 
 ```{r,results='asis'}
-data <- data[,fp := rnorm(1), statefip]
-fit1 = lm(lnwage ~ fp + yrseduc + age + I(age^2) + statefip ,data)
-htmlreg(fit1,single.row=TRUE,omit.coef="state")
+set.seed(549038) # I fix the seed to make sure the draws are reproducible
+data <- data[,fg := runif(.N)>0.8]
+data <- data[fg==0,fp := runif(1)>0.8, statefip]
+data <- data[fg==1,fp := runif(1)>0.2, statefip]
+fit1 = lm(lnwage ~fp+fg,data)
+htmlreg(fit1,single.row=TRUE)
 ```
 
+<span class="label label-info">Note</span> We do not control for state specific fixed effect as these would would be perfectly colinear with the policy.
+
+
+
 Now this is surprising. To gain understanding on what is happening we will use the real data, but we will also generate our own data in a where we control exactly what is happening.
+
+
 
 ### IID errors
 
@@ -111,9 +120,9 @@ data[, res_hat := {
   r
 },statefip]
 data[,y2:= yhat + res_hat]
-data[,fp:=rnorm(1),statefip]
+data <- data[,fp := runif(1)>0.5, statefip]
 
-fitn = lm(y2 ~ fp+yrseduc + age + I(age^2) + statefip,data)
+fitn = lm(y2 ~ fp+yrseduc + age + I(age^2),data)
 htmlreg(fitn,single.row=TRUE,omit.coef="state")
 
 ```
