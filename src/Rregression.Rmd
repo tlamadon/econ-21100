@@ -6,6 +6,13 @@ header-includes:
 - \usepackage{graphicx}
 - \usepackage{setspace}
 - \usepackage{cleveref}
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
 ---
 
 \newcommand{\beq}{\begin{equation}}
@@ -49,9 +56,7 @@ The function that does the regression is `lm`. To see how it works, let's use th
 
 ```{r lm}
 library(datasets)
-mtcars
-rownames(mtcars) = NULL # let's remove the row-labels as we don't care them for our purpose.
-mtcars
+head(mtcars) # this prints the first 6 observations of the dataset
 ```
 
 If we want to regress `mpg` on a constant and `wt`, we write this.
@@ -91,7 +96,7 @@ regFitWithoutConst = lm(mpg ~ -1 + wt, data=mtcars)
 summary(regFitWithoutConst)
 ```
 
-Of course we can add other regressors.
+We can also add other regressors.
 
 ```{r lm6}
 regressionFit = lm(mpg ~ wt + cyl + disp, data=mtcars)
@@ -105,11 +110,11 @@ regressionFit = lm(mpg ~ wt + factor(cyl) + disp, data=mtcars)
 summary(regressionFit)
 ```
 
-If you want to use `wt^2` as a regressor, one way is to create another column in the `data.frame`.
+If you want to use `wt^2` as a regressor, there are two ways to do it. One way is to create another column in the `data.frame`.
 
 ```{r lm8}
 mtcars$wt2 = mtcars$wt^2 # the dataframe creates the column wt2 and assign the values.
-mtcars
+head(mtcars)
 summary(lm(mpg ~ wt + wt2, data=mtcars))
 ```
 
@@ -135,14 +140,119 @@ lm(formula = mpg ~ wt + disp, data=mtcars)
 
 The function `I` orders R to read operators like `+` and `^` inside `I` as an arithmetic operator. So the operator `^` in `I(wt^2)` is interpreted as a power operator. Similarly, `I(cyl+disp)` interprets `+` as an arithmetic operator and not the operator that says we have two regressors `cyl` and `disp`.
 
+## Heteroskedasticity
 
-# probit and logit
+The `lm` function computes standard errors under the constant-variance assumption. To account for heteroskedasticity, we use the `sandwich` and the `lmtest` package. 
+
+Let's first load the package.
+
+```{r sandwich}
+library(sandwich)
+library(lmtest)
+```
+
+We use the following regression as an example.
+
+```{r}
+lfit = lm(formula = mpg ~ wt + disp, data=mtcars)
+summary(lfit)
+```
+
+As mentioned earlier, the standard errors in the above regression are based on the constant-variance assumption. Now we compute the heteroskedasticity-robust standard error. We use the `vcovHC` function in the `sandwich` package:
+
+```{r}
+vcHC = vcovHC(lfit, type = "HC0")
+```
+
+Note that we use the result of `lm` function as the first argument of `vcovHC`. 
+
+The above command computes the variance-covariance matrix by the estimator
+
+$$
+  vcHC = (X'X)^{-1}X'\Omega X(X'X)^{-1}
+$$
+
+where
+$$
+  \Omega = \text{diag}(u_1^2, \ldots, u_N^2)
+$$
+where $u_i$ is the residual for individual $i$.
+
+We can instead specify `HC1`, `HC2`, `HC3`, etc. as an argument to `type`. These are all finite-sample corrections to the above estimator.
+
+Now, to generate the analog of `summary(lfit)`, we use the `coeftest` function in the `lmtest` package:
+
+```{r}
+coeftest(lfit, vcov. = vcHC)
+```
+
+Compare the above result with the result of the `lm` function. We can see that the standard errors are corrected in the above. 
+
+```{r}
+summary(lfit)
+```
+
+## Clustered errors
+
+We can also compute clustered standard errors using `sandwich` package. However, to do so, we need to tell `vcovHC` that what variables represent the group and the time indices. We need the `plm` package for this.
+
+```{r}
+library(plm)
+```
+
+The `plm` function in the `plm` package allows to do several kinds of panel data regressions. However, at this time, we use `plm` to do exactly what `lm` does, except that we store information on what are the group and the time indices. 
+
+To discuss how to use `plm`, we use the following dataset as an example.
+```{r}
+data("Grunfeld", package = "plm")
+head(Grunfeld)
+```
+
+Consider the following regression which uses `lm` function.
+
+```{r}
+pfitl = lm(inv ~ value + capital, data=Grunfeld)
+summary(pfitl)
+```
+
+The following code produces exactly the same result:
+
+```{r}
+pfit = plm(inv ~ value + capital, model="pooling", index="firm", data=Grunfeld)
+summary(pfit)
+```
+
+The option `model="pooling"` makes `plm` to run the usual regression that `lm` does. The option `index=firm` tells `plm` that the observations are grouped according to the `firm` variable.
+
+Now we create the clustered standard errors by the following code.
+
+```{r}
+vcHCcluster = vcovHC(pfit, type = "HC0", cluster = "group")
+```
+
+Note that the value for the argument `cluster`, which is `"group"`, is not the name of the variable in the dataset `Grunfeld`. The option `cluster = "group"` tells that we use the group index saved in `pfit` as the cluster.
+
+The above command computes the estimator
+
+$$
+  vcHCcluster = \left(\sum_{k=1}^K X_k'X_k\right)^{-1} \sum_{k=1}^K X_k'U_kU_k'X_k \left(\sum_{k=1}^K X_k'X_k\right)^{-1}
+$$
+
+where $X_k$ is the matrix of regressors for the $k$th cluster and $U_k$ is the residual vector for the $k$th cluster.
+
+To correct for standard errors, we again use the `coeftest` function.
+
+```{r}
+coeftest(pfit, vcov. = vcHCcluster)
+```
+
+# Probit and logit
 
 For probit and logit, we use `glm`. Using it is very much similar to using `lm`.
 
 ```{r glm}
 # recall:
-mtcars
+head(mtcars)
 
 # let's run probit with some random formula. 
 probitFit = glm(am ~ mpg + disp, family = binomial(link="probit"), data = mtcars)
