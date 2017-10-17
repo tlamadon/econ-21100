@@ -28,17 +28,26 @@ require(sandwich)
 options(knitr.table.format = "html") 
 ```
 
-We are going to reproduce an exercise similar to the example for the computation of standard error.  Start by downloading the CPS data from [here](http://cameron.econ.ucdavis.edu/research/cameron_miller_JHR_files%20to%20share.zip). 
+
 
 Here is some relevant material:
 
  - [Econometric Computing with HC and HAC Covariance Matrix Estimators](https://cran.r-project.org/web/packages/sandwich/vignettes/sandwich.pdf)
  - R [sandwich](https://cran.r-project.org/web/packages/sandwich/index.html) package
+ - R [lmtest](https://cran.r-project.org/web/packages/lmtest/index.html) package
 
-For this part load the data.
+To install these packages
+
+```r
+install.packages("lmtest")
+install.packages("sandwich")
+```
+
+We are going to reproduce an exercise similar to the example for the computation of standard error.  Start by downloading the CPS data from [here](http://cameron.econ.ucdavis.edu/research/cameron_miller_JHR_files%20to%20share.zip).  We first load the data into R.
 
 ```{r}
-data = read.dta13("~/Downloads/files to share/CPS_2012_micro.dta")
+# replace this with the path to your download folder
+data = read.dta13("~/Downloads/files to share/CPS_2012_micro.dta") 
 data = data.table(data)
 data$age = as.numeric(data$age)
 ```
@@ -46,11 +55,9 @@ data$age = as.numeric(data$age)
 Next generate a fictuous policy that you randomly assigned at the state times gender level. Run the regression and report standard errors given by R for one draw of the poilcy.
 
 ```{r,results='asis'}
-set.seed(549038) # I fix the seed to make sure the draws are reproducible
-data <- data[,fg := runif(.N)>0.8]
-data <- data[fg==0,fp := runif(1)>0.8, statefip]
-data <- data[fg==1,fp := runif(1)>0.2, statefip]
-fit1 = lm(lnwage ~fp+fg,data)
+set.seed(60356548) # I fix the seed to make sure the draws are reproducible
+data <- data[,fp := runif(1)>0.5, statefip]
+fit1 = lm(lnwage ~fp,data)
 htmlreg(fit1,single.row=TRUE)
 ```
 
@@ -58,22 +65,20 @@ htmlreg(fit1,single.row=TRUE)
 
 
 
-Now this is surprising. To gain understanding on what is happening we will use the real data, but we will also generate our own data in a where we control exactly what is happening.
-
-
+Now this is surprising. We generated `fp` randomly across states and so we should have that when the number of states becomes very large $E(\epsilon_i fp_i)=0$. To gain understanding on what is happening we will generate our own data in a way where we control exactly what is happening.
 
 ### IID errors
 
-Let's start by reassuring ourselves. Let's use an IID dgp, run the regression and check the significance.
+Let's start by reassuring ourselves. Let's use an IID data generating process (DGP), run the regression and check the significance.
 
- 1. regress without using `fp` variable, then use the `predict command` to get predicted value
- 2. estimate an "homoskedastic" s.e. for the residuals by taking the variance of the residuals
- 3. simulate a fake outcome by adding a truly i.i.d. normal error to your predicted value
- 4. run the regression including `fp` and collect its coefficient, also save if the coefficient is significant at 5%
- 5. run the last steps 500 times 
+ 1. compute the variance of `lnwage` in the sample. This is an estimate of our homoskedastic error.
+ 2. simulate a fictuous outcome `y2` by adding to `fp` a normal error with the estimated variance, and truly independent across individuals. Use `y2:=rnorm(.N)*var_est` inside your data.table data.
+ 3. regress this outcome `y2` on `fp`, our fictuous policy and collect the coefficient, also save if the coefficient is significant at 5%.
+ 4. run steps (2,3) 500 times.
  
-<span class="label label-success">Question 3</span> follow the previous steps and report the rejection rate of the test on `fp`. You should find something close to 5% and you should feel better!
+<span class="label label-success">Question 3</span> Follow the previous steps and report the rejection rate of the test on `fp`. You should find something close to 5% and you should feel better!
 
+<!--
 <span class="label label-success">Question 4</span> construct the variance covariance matrix by hand. To do this we extract the matrix of regressors, and in this case we assume homoskedasticity.
 
 ```{r,eval=FALSE}
@@ -83,35 +88,36 @@ VV  = ...  # << compute the Variance matrix of the parameters,
 VV[colnames(XX)=="fpTRUE"]      # << extract the coeff for fp
 ```
 
-The result should very similar to using `vcovHC` from the sandwish package with the option `type="const"`.
+The result should very similar to using `vcovHC` from the sandwish package with the option `type="const"`. -->
 
 ### Heteroskedastic errors
 
-Now we want to compute heteroskedastic robust standard errors. We then want to repeat the previous procedure, but we are going to use a different test for the significance. For this we want to recover the design matrix and the residuals and compute the asymptotic variance ourselves. Given that we have already extracted the design matrix and the residuals. We then want to construct our variance co-variance matrix using the following formula:
+Now we want to compute heteroskedastic robust standard errors which requires us to use some co-variates. We then want to repeat the previous procedure, but we are going to use a different test for the significance. We then want to construct our variance co-variance matrix using the following formula:
 
 $$ V =(X'X)^{-1} X' \Omega X' (X'X)^{-1} $$
-where $\Omega = diag \{ \epsilon_i^2 \}$
+where $\Omega = diag \{ \epsilon_i^2 \}$. Using vcovHC with type `type="const"` and `type="HC0"` will do that for you!
 
-<span class="label label-success">Question 5</span> Construct the heteroskedsastic variance matrix. Then report the standard error on `fp`. Compare this value to the value returned using `vcovHC` with `type="HC0"`.
+<!-- <span class="label label-success">Question 5</span> Construct the heteroskedsastic variance matrix. Then report the standard error on `fp`. Compare this value to the value returned using `vcovHC` with `type="HC0"`.-->
 
 We want to check this by simulating from a model with heteroskedesatic errors. To do so we are going to use linear model for the variance.
 
- 1. using residuals from `fit1`, regress the square of the residual on the same co-variates as previously
- 2. predict the value of the sqaure residual at for each individual, store this as  new variable `s`
- 3. when simulating data, drawn normal residuals and multiply it by individual specific variance
- 4. replicate this 500 times, evaluate the significance of `fp` using vcovHC with type `type="const"` and `type="HC0"`
+ 1. use the following regression `lnwage ~ yrseduc + age + I(age^2)` and regress the square of the residual on the same co-variates formula to get an estimate of the heteroskedastic variance.
+ 2. predict the value of the square residual for each individual in the data and store this as  new variable `s`.
+ 3. predict the value of the level and store it in `pred`.
+ 4. simulate data by drawing a normal, multiplying it by individual specific variancs `s` and adding the `pred`.
+ 5. replicate (4) this 500 times, evaluate the significance of `fp` using vcovHC with type `type="const"` and `type="HC0"`.
 
-<span class="label label-success">Question 6</span> Report the rejection rate for each of the variance evaluation.
+<span class="label label-success">Question 4</span> Follow the steps and report the rejection rate for each of the variance evaluation.
   
 ### State clustered errors
 
-We are again here going to try to simulate corrolated error within state. For this we pick a correlation parameter $\rho$. Then so simulate we are going to draw the first individual in an iid way, then using an auto-regressive structure to compute the error of the following people. Given $\rho$ it can be done in the following way:
+We are again here going to try to simulate corrolated error within state. For this we pick a correlation parameter $\rho$. Then, to simulate we are going to draw the first individual in an iid way, then using an auto-regressive structure to compute the error of the following people. Given $\rho$ it can be done in the following way:
 
 ```{r,results='asis'}
-fit0  = lm(lnwage ~ yrseduc + age + I(age^2) + statefip,data)
-data[,yhat := predict(fit0)]
-rho = 0.7
-data[, res_hat := {
+fit0  = lm(lnwage ~ yrseduc + age + I(age^2),data)
+data <- data[,yhat := predict(fit0)]
+rho = 0.8
+data <- data[, res_hat := {
   r = rep(0,.N)
   r[1] = rnorm(1)
   for (i in 2:.N) {
@@ -119,17 +125,17 @@ data[, res_hat := {
   }
   r
 },statefip]
-data[,y2:= yhat + res_hat]
+data <- data[,y2:= yhat + res_hat]
 data <- data[,fp := runif(1)>0.5, statefip]
-
 fitn = lm(y2 ~ fp+yrseduc + age + I(age^2),data)
-htmlreg(fitn,single.row=TRUE,omit.coef="state")
+#summary(fitn)
 
+htmlreg(fitn,single.row=TRUE,omit.coef="state")
 ```
 
-<span class="label label-success">Question 7</span> Explain the expression that starts with `data[, res_hat := {...`
+<span class="label label-success">Question 5</span> Explain the expression that starts with `data[, res_hat := {...`
 
-<span class="label label-success">Question 8</span> For $\rho=0.1,0.2,...,0.9$ run 500 replications and report the proportion at each value of replication for which the coefficient on our ficutous policy was significant at 5%.
+<span class="label label-success">Question 6</span> For $\rho=0.7,0.8,0.9$ run 500 replications and report the proportion at each value of replication for which the coefficient on our ficutous policy was significant at 5%.
 
 ### State level bootstrap
 
@@ -137,15 +143,15 @@ We have not covered this in class yet, but one could instead try to resample the
 
 Use the following procedure:
 
-  1. Draw from the 51 states (at the state level) with replacement
+  1. Draw 51 states from the 51 states (at the state level) with replacement
   2. Create a dataset from the actual data, appending the observations for each of the state 
     - when a state appears multiple times, attach the data of that state, but treat these states as different. In other words the names of the states in this synthetic data set should just be 1,2,3,4...51.
   3. compute the regression on this synthetic data set
   4. store the resulting regression coeffecient for each repetition, repeat 500 times.
   
-**help:** do not redraw `fp`!
+<span class="label label-info">Note</span> do not redraw `fp`!
   
-<span class="label label-success">Question 9</span> Report the 0.025 and 0.0975 quantiles for the regression coefficients. Does this interval include 0?
+<span class="label label-success">Question 7</span> Report the 0.05 and 0.095 quantiles for the regression coefficients. This is a test at 10%, does this interval include 0? 
 
 
 
