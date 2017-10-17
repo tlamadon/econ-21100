@@ -142,7 +142,7 @@ The function `I` orders R to read operators like `+` and `^` inside `I` as an ar
 
 ## Heteroskedasticity
 
-The `lm` function computes standard errors under the constant-variance assumption. To account for heteroskedasticity, we use the `sandwich` and the `lmtest` package. 
+The `lm` function computes standard errors under the constant-variance assumption. We can account for heteroskedasticity, for which we use the `sandwich` and the `lmtest` package. 
 
 Let's first load the package.
 
@@ -172,13 +172,13 @@ $$
   vcHC = (X'X)^{-1}X'\Omega X(X'X)^{-1}
 $$
 
-where
+where $X$ is the matrix of regressors and 
 $$
   \Omega = \text{diag}(u_1^2, \ldots, u_N^2)
 $$
 where $u_i$ is the residual for individual $i$.
 
-We can instead specify `HC1`, `HC2`, `HC3`, etc. as an argument to `type`. These are all finite-sample corrections to the above estimator.
+For the value of the argument `type`, we can instead write `HC1`, `HC2`, `HC3`. These are all finite-sample corrections to the above estimator.
 
 Now, to generate the analog of `summary(lfit)`, we use the `coeftest` function in the `lmtest` package:
 
@@ -194,13 +194,13 @@ summary(lfit)
 
 ## Clustered errors
 
-We can also compute clustered standard errors using `sandwich` package. However, to do so, we need to tell `vcovHC` that what variables represent the group and the time indices. We need the `plm` package for this.
+We can also compute clustered standard errors using `sandwich` package. However, to do so, we need to tell `vcovHC` that which variables represent the group and the time indices. We need the `plm` package for this.
 
 ```{r}
 library(plm)
 ```
 
-The `plm` function in the `plm` package allows to do several kinds of panel data regressions. However, at this time, we use `plm` to do exactly what `lm` does, except that we store information on what are the group and the time indices. 
+The `plm` function in the `plm` package allows to do several kinds of panel data regressions. However, at this time, we use `plm` to do exactly what `lm` does (i.e. OLS), except that we store information on what are the group and the time indices. 
 
 To discuss how to use `plm`, we use the following dataset as an example.
 ```{r}
@@ -208,7 +208,7 @@ data("Grunfeld", package = "plm")
 head(Grunfeld)
 ```
 
-Consider the following regression which uses `lm` function.
+Consider the following OLS.
 
 ```{r}
 pfitl = lm(inv ~ value + capital, data=Grunfeld)
@@ -222,9 +222,9 @@ pfit = plm(inv ~ value + capital, model="pooling", index="firm", data=Grunfeld)
 summary(pfit)
 ```
 
-The option `model="pooling"` makes `plm` to run the usual regression that `lm` does. The option `index=firm` tells `plm` that the observations are grouped according to the `firm` variable.
+The option `model="pooling"` makes `plm` to run OLS. The option `index=firm` tells `plm` that the observations are grouped according to the `firm` variable.
 
-Now we create the clustered standard errors by the following code.
+Now we create clustered standard errors by the following code.
 
 ```{r}
 vcHCcluster = vcovHC(pfit, type = "HC0", cluster = "group")
