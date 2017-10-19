@@ -8,6 +8,8 @@ output:
     toc_float:
       collapsed: false
       smooth_scroll: false
+editor_options: 
+  chunk_output_type: console
 ---
 
  1. consider estimation of demand model for transport
@@ -208,15 +210,69 @@ plot(liks)
 
 ```
 
-
-# The shape of the error distribution
-
-
-
-
-
+# Max rank estimator
 
 ```{r}
+require(RcppSimpleTensor)
+data("Train", package = "mlogit")
+data = Train
+fit = glm(choice=="choice1" ~ 0 + I(log(price1/price2)) + I(log(time1/time2)),data,family = binomial())
+N = nrow(data)
+
+ggplot(data,aes(x=log(price1/price2),y=log(time1/time2),color=choice)) + geom_point() + theme_bw()
+
+# let's put this in matrices
+X = cbind( log(data$price1/data$price2), log(data$time1/data$time2))
+colnames(X) = c("price","time")
+Y = (data$choice == "choice1")*1
+
+t.tmp = tensorFunction(R[i] ~ I(VV[i]<VV[j])*I(Y[i]<Y[j]) + I(VV[i]>VV[j])*I(Y[i]>Y[j]))
+
+# score function
+score <- function(beta) {
+  tot = 0; 
+  VV = as.numeric(X %*% beta)
+  tot = sum(t.tmp(VV,Y))
+  return(data.frame(b1=beta[1],b2=beta[2],val=log(tot)))
+}
+
+rr =score(c(0.1,0.1))
+
+require(foreach)
+rr = data.table(foreach(b1 = seq(-5,-3,l=40),.combine=rbind) %:% 
+                  foreach(b2 = seq(-3,-1,l=40),.combine=rbind) %do%
+                  score(c(b1,b2)))
+
+library(lattice)
+wireframe(val~b1+b2,rr)
+
+I = which.max(rr$val)
+beta_hat = as.numeric(rr[I,c(b1,b2)])
+beta     = as.numeric(fit$coefficients)
+
+ggplot(rr,aes(x=b1,y=val,color=b2,group=b2)) + geom_line() +theme_bw() + 
+  geom_vline(xintercept = beta[1],color="red",linetype=2) + 
+  geom_vline(xintercept = beta_hat[1],color="blue",linetype=2)
+
+ggplot(rr,aes(x=b2,y=val,color=b1,group=b1)) + geom_line() +theme_bw() + 
+  geom_vline(xintercept = beta[2],color="red",linetype=2) + 
+  geom_vline(xintercept = beta_hat[2],color="blue",linetype=2)
+
 #fit2 <- mlogit(choice ~ price + time + change + comfort |-1, Tr)
 ```
+
+
+Recovering the distribution of unbosverables:
+```{r}
+dd = data.table(Y=Y,R_hat= as.numeric(X%*%beta_hat))
+g <- function(x0,h) dd[, sum( Y * dnorm( (R_hat-x0)/h))/sum( dnorm( (R_hat-x0)/h)) ]
+h=0.3
+dd = dd[, F_hat := g(R_hat,h),R_hat]
+
+ggplot(dd,aes(x=R_hat,y=F_hat)) + geom_line(color="red")  + theme_bw() +  
+  geom_line(aes(x=R_hat,y=plogis(R_hat)),color="blue",linetype=2) +
+  geom_line(aes(x=R_hat,y=pnorm(R_hat)),color="green",linetype=2)
+
+```
+
 
