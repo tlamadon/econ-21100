@@ -216,7 +216,7 @@ plot(liks)
 require(RcppSimpleTensor)
 data("Train", package = "mlogit")
 data = Train
-fit = glm(choice=="choice1" ~ 0 + I(log(price1/price2)) + I(log(time1/time2)),data,family = binomial())
+fit = glm(choice=="choice1" ~ 0 + I(log(price1/price2)) + I(log(time1/time2)),data,family = binomial('probit'))
 N = nrow(data)
 
 ggplot(data,aes(x=log(price1/price2),y=log(time1/time2),color=choice)) + geom_point() + theme_bw()

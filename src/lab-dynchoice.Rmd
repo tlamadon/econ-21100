@@ -1,0 +1,131 @@
+---
+title: "Lab on Dynamic Discrete Choice"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+editor_options: 
+  chunk_output_type: console
+---
+
+ 1. Consider a simple saving problem (cake eating)
+ 2. Explain Bellman problem without uncertainty
+ 3. Explain Bellman problem with uncertainty
+ 4. Solve simple consumption saving problem
+ 5. Simulate transitory and permanent policies
+ 6. Plot a fit using some simple distance, an indirect inference estimator
+
+We consider here discrete choices over a set of alernatives. The utility of the agent is modeled as 
+
+# Cake eating
+
+Imagine you a given a cake os size $S$, and you need to decide how much to eat everyday. How would you formulate the problem?
+
+$$   \max_{c_t}  \sum_{t=0}^\infty \beta^t u( c_t) \quad s.t. \quad \sum_{t=0}^\infty c_t \leq S$$
+One can write the Lagrangian of this problem and find:
+
+$$L = \sum_{t=0}^\infty \beta^t u( c_t) - \lambda \Big(  \sum_{t=0}^\infty c_t - S \Big)$$
+
+and when the error term is type 2 extreme value. This gives the following FOCs:
+
+$$ \beta^t u'(c_t) = \lambda  $$
+
+Consider a CRRA utility function $u(c)=\frac{c^{1-\gamma}}{1-\gamma}$ which gives $ u'(c)=c^{-\gamma}$ and hence
+$$ \sum_{t=0}^\infty c_t = \sum_{t=0}^\infty \Big( \frac{\lambda}{\beta^t} \Big)^{-\frac{1}{\gamma} } = \frac{\lambda^{-\frac{1}{\gamma}}}{1-\beta^{1/\gamma-1}} =S $$
+hence we get that the consumption will be 
+
+$$c_t = \Big( \frac{\lambda}{\beta^t} \Big)^{-\frac{1}{\gamma} } = (1-\beta^{1/\gamma-1})\beta^{t/\gamma}S$$
+
+We can easily plot this for different values of $\beta$ and $\gamma$
+
+```{r}
+
+```
+
+## A recursive formulation
+
+Let's introduce $V(S)$ as the present value, the life time value of having a cake of size $S$ today and consuming optimally in the future.
+
+$$V(S) = \max_{c_t}  \sum_{t=0}^\infty \beta^t u( c_t) \quad s.t. \quad \sum_{t=0}^\infty c_t \leq S$$
+But note that 
+
+$$V(S) = \max_{c}  u(c) + \beta V(S-c) $$
+
+# The bus engine problem
+
+Imagine that we want to model the decision to replace the engine on in a fleet of buses. 
+
+ - the state is $x_t$, the mileage of the bus
+ - every period, the bus delivers profit as a function of $x_t$, call it $p(x_t)$
+ - the bus owner Mr Zurcher, can decide to replace the engine at cost $C$ in which case $x_t$ goes back to $0$
+ - the bus dies with probability a function of $x_t$ in which case the owner gets $0$
+ - the owner discounts at rate $\beta$
+
+Using our Bellman tool we can write the optimal decision for this problem recursively:
+
+$$ V(x) = \max \{ p(x) + \lambda(x)\beta V(x+u) , -C + \beta V(0) \} $$
+We can see that this will have a threshold property. In practice the decision won't be as clear as a simple threshold. We want to allow for some randomness. We then add a logit preference shock $\xi$ to the different between the two options. We then remember that we can transform the max into a log-sum-exp.
+
+$$ V(x) = \log\Big( \exp \Big[p(x) + \lambda(x)\beta V(x+u)\Big] + \exp \Big[ -C + \beta V(0) \Big] \Big) + \gamma $$
+
+There is not hope to solve this problem in closed form. We tackle it numerically.
+
+
+```{r}
+n      = 100
+V      = rep(0,n)
+x      = seq(0,100,l=n)
+lambda = 1/(1+exp(0.05*x))
+beta   = 0.9
+C      = 2
+P      = exp(-0.01*x)
+In = c(2:n,n)
+
+rr = data.frame()
+for (i in 1:100) {
+  V = log( exp( P + lambda*beta*V[In]) +  exp(-C + beta*V[1] )  ) + 0.56
+  rr = rbind(rr,data.frame(x=x,V=V,rep=i,v1=P + lambda*beta*V[In],v2=-C + beta*V[1] ))
+}
+rr = data.table(rr)
+ggplot(rr[rep<5],aes(x=x,y=v1,group=rep,color=factor(rep))) + 
+  geom_line() +geom_hline(aes(yintercept =v2,color=factor(rep)) )
+
+# we can look at the probability to replace
+rr2 = data.frame(x=x,V=V,rep=i,v1=P + lambda*beta*V[In],v2=-C + beta*V[1] )
+ggplot(rr2,aes(x=x,y=1/(1+exp(v1-v2)))) + geom_line()
+
+ggplot(rr2,aes(x=x,y=V)) + geom_line()
+
+```
+
+```{r}
+n      = 100
+V      = rep(0,n)
+x      = seq(0,100,l=n)
+lambda = 1/(1+exp(0.1*abs(x-25)))
+beta   = 0.9
+C      = 1.2
+P      = exp(-0.01*x)
+In = c(2:n,n)
+
+rr = data.frame()
+for (i in 1:100) {
+  V = log( exp( P + lambda*beta*V[In]) +  exp(-C + beta*V[1] )  ) + 0.56
+  rr = rbind(rr,data.frame(x=x,V=V,rep=i,v1=P + lambda*beta*V[In],v2=-C + beta*V[1] ))
+}
+rr = data.table(rr)
+ggplot(rr[rep<5],aes(x=x,y=v1,group=rep,color=factor(rep))) + 
+  geom_line() +geom_hline(aes(yintercept =v2,color=factor(rep)) )
+
+# we can look at the probability to replace
+rr2 = data.frame(x=x,V=V,rep=i,v1=P + lambda*beta*V[In],v2=-C + beta*V[1] )
+ggplot(rr2,aes(x=x,y=1/(1+exp(v1-v2)))) + geom_line()
+
+ggplot(rr2,aes(x=x,y=V)) + geom_line()
+
+```
+
