@@ -79,7 +79,7 @@ There is not hope to solve this problem in closed form. We tackle it numerically
 n      = 100
 V      = rep(0,n)
 x      = seq(0,100,l=n)
-lambda = 1/(1+exp(0.05*x))
+lambda = 1/(1+exp(0.1*(x-50)))
 beta   = 0.9
 C      = 2
 P      = exp(-0.01*x)
@@ -87,11 +87,17 @@ In = c(2:n,n)
 
 rr = data.frame()
 for (i in 1:100) {
-  V = log( exp( P + lambda*beta*V[In]) +  exp(-C + beta*V[1] )  ) + 0.56
   rr = rbind(rr,data.frame(x=x,V=V,rep=i,v1=P + lambda*beta*V[In],v2=-C + beta*V[1] ))
+  V2 = log( exp( P + lambda*beta*V[In]) +  exp(-C + beta*V[1] )  ) + 0.56
+  dist = mean((V2-V)^2)
+  V=V2
 }
 rr = data.table(rr)
-ggplot(rr[rep<5],aes(x=x,y=v1,group=rep,color=factor(rep))) + 
+ggplot(rr[rep<7],aes(x=x,y=V,group=rep,color=factor(rep))) + 
+  geom_line()
+
+
+ggplot(rr[rep==20],aes(x=x,y=v1,group=rep,color=factor(rep))) + 
   geom_line() +geom_hline(aes(yintercept =v2,color=factor(rep)) )
 
 # we can look at the probability to replace
@@ -102,30 +108,92 @@ ggplot(rr2,aes(x=x,y=V)) + geom_line()
 
 ```
 
+
+
+# simulating data
+
+
 ```{r}
-n      = 100
-V      = rep(0,n)
-x      = seq(0,100,l=n)
-lambda = 1/(1+exp(0.1*abs(x-25)))
-beta   = 0.9
-C      = 1.2
-P      = exp(-0.01*x)
-In = c(2:n,n)
+PR1 = 1/(1+exp( P + lambda*beta*V[In] - (-C + beta*V[1])))
 
 rr = data.frame()
 for (i in 1:100) {
-  V = log( exp( P + lambda*beta*V[In]) +  exp(-C + beta*V[1] )  ) + 0.56
-  rr = rbind(rr,data.frame(x=x,V=V,rep=i,v1=P + lambda*beta*V[In],v2=-C + beta*V[1] ))
+  rrr = data.frame()
+  x=1
+  l=1
+  R=0
+  for (t in 1:100) {
+   
+    if (l==0) {
+      rrr = rbind(rrr,data.frame(i=i,t=t,x=0,l=0,profit=0,R=0))
+      next
+    }
+    
+    # draw the maintenance choice
+    if (PR1[x]>runif(1)) {
+      R=1
+      profit = -C
+     
+    } else {
+      R=0
+      profit = P[x]
+    
+      if (lambda[x]<runif(1)) {
+        l=0
+      }
+    }
+    rrr = rbind(rrr,data.frame(i=i,t=t,x=x,l=1,profit=profit,R=R))
+    if (R==1) {
+       x=1
+    } else {
+      x= x+1      
+    }
+  }
+  rr = rbind(rr,rrr)
 }
-rr = data.table(rr)
-ggplot(rr[rep<5],aes(x=x,y=v1,group=rep,color=factor(rep))) + 
-  geom_line() +geom_hline(aes(yintercept =v2,color=factor(rep)) )
 
-# we can look at the probability to replace
-rr2 = data.frame(x=x,V=V,rep=i,v1=P + lambda*beta*V[In],v2=-C + beta*V[1] )
-ggplot(rr2,aes(x=x,y=1/(1+exp(v1-v2)))) + geom_line()
-
-ggplot(rr2,aes(x=x,y=V)) + geom_line()
+data = data.table(rr)
+data[,sum(l==1),i][,mean(V1)]
+ggplot(data[i==1],aes(x=t,y=profit)) + geom_line()
 
 ```
+
+
+# Writing a likelihood
+
+We can write the likelihood of the decision and miles and sum accross individuals
+
+```{r}
+
+lik <- function(theta) {
+  n      = 100
+  V      = rep(0,n)
+  x      = seq(0,100,l=n)
+  lambda = 1/(1+exp(0.1*(x-50)))
+  beta   = 0.9
+  C      = theta
+  P      = exp(-0.01*x)
+  In = c(2:n,n)
+  
+  rr = data.frame()
+  for (i in 1:100) {
+    rr = rbind(rr,data.frame(x=x,V=V,rep=i,v1=P + lambda*beta*V[In],v2=-C + beta*V[1] ))
+    V2 = log( exp( P + lambda*beta*V[In]) +  exp(-C + beta*V[1] )  ) + 0.56
+    dist = mean((V2-V)^2)
+    V=V2
+  }
+  Pr  =1/(1+exp( P + lambda*beta*V[In] - (-C + beta*V[1])))
+  data[l==1,sum(log(Pr[x])*(R==1) + log(1-Pr[x])*(R==0)) ]
+}
+
+
+V = sapply(seq(1,3,l=30),lik)
+plot(seq(1,3,l=30),V)
+
+
+
+```
+
+
+
 
