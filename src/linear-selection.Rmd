@@ -12,9 +12,15 @@ editor_options:
   chunk_output_type: console
 ---
 
-# Example ridge regression
+# Overview
 
-```{r}
+## Ridge regression
+
+We try to minimize 
+
+$$ \sum_{i=1}^n \Big( Y_i - X_i \beta   \Big)^2 + \lambda \sum_p \beta_p^2 $$
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE}
 require(ggplot2)
 require(data.table)
 require(reshape2)
@@ -22,6 +28,8 @@ require(foreach)
 require(MASS)
 require(stringr)
 library(glmnet)
+library(kableExtra)
+library(knitr)
 
 # let's consider a simple model with p independent regressors
 p=10
@@ -29,33 +37,28 @@ beta = rnorm(p)
 n  = 20
 p2 = 15
 sigma = 1.5
-
-rr = data.table(foreach (i = 1:500,.combine=rbind) %do% {
-  X = array(rnorm(p2*n),c(n,p2));
-  Y = X %*% c(beta,rep(0,p2-p)) + sigma*rnorm(n)
-  fit = lm(Y~0+X)
-  res = data.frame(value=coef(fit),value0=c(beta,rep(0,p2-p)))
-  res$rep = i
-  res$name = rownames(res)
-  res
-})
-
 ```
+
 
 ## checking the bias and variance
 
+When looking at 
+
+
+
 
 ```{r}
+set.seed(43215)
+
 # let's consider a simple model with p independent regressors
 p    = 10
-beta = rnorm(p)
-beta[1] = 1.2
+beta = rev(sort(rnorm(p)))
 n    = 20
 p2   = 18
 
 # let's regularize it
 
-rr = data.table( foreach (lambda = seq(0,5,l=20),.combine=rbind) %:% foreach (i = 1:2000,.combine=rbind) %do% {
+rr = data.table( foreach (lambda = seq(0,5,l=20),.combine=rbind) %:% foreach (i = 1:500,.combine=rbind) %do% {
   X = array(rnorm(p2*n),c(n,p2));
   Y = X %*% c(beta,rep(0,p2-p)) + sigma*rnorm(n)
   fit = lm.ridge(Y~0+X,lambda=lambda)
@@ -68,138 +71,187 @@ rr = data.table( foreach (lambda = seq(0,5,l=20),.combine=rbind) %:% foreach (i 
 
 rs = rr[,list(bias=mean(value-value0)^2,var=var(value-value0),mse=mean((value-value0)^2)),list(name,lambda)]
 ggplot(rs[name=="X1"],aes(x=lambda,y=mse)) + geom_line() + theme_bw() + 
-  geom_line(aes(y=bias),color="red") + geom_line(aes(y=var),color="blue") +scale_y_log10()
+  geom_line(aes(y=bias),color="red") + geom_line(aes(y=var),color="blue") +scale_y_log10() +
+  geom_vline(xintercept = rs[name=="X1"][which.min(mse),lambda],linetype=2)
 
 ls = unique(rr$lambda)[c(1,5,10,15)]
 ggplot(rr[name=="X1"][lambda %in% ls],aes(x=value, group=lambda,fill=lambda,color=lambda)) + 
   geom_density(alpha=0.3) + geom_vline(xintercept = beta[1],linetype=2) + theme_bw() + xlim(-1,3)
-rr
+
 ```
 
 ```{r}
-# looking at the results in this case
+# looking at the results in this case - extracting the best lambda
 r2 = rs[name %in% paste("X",1:p,sep=""),mean(mse),lambda]
 lambda_star = r2[,{I=which.min(V1);lambda[I]}]
 beta0 = c(beta,rep(0,p2-p))
 
-X = array(rnorm(p2*n),c(n,p2));
 Y = X %*% c(beta,rep(0,p2-p)) + sigma*rnorm(n)
+# ridge at best lambda
 fit  = lm.ridge(Y~0+X,lambda=lambda_star)
+# OLS 
 fit2 = lm.ridge(Y~0+X,lambda=0)
-X = array(rnorm(p2*n),c(n,p2));
-Y = X %*% c(beta,rep(0,p2-p))
+# remove noise to get the truth
+Y = X %*% c(beta,rep(0,p2-p)) 
 fit3 = lm(Y~0+X)
 
+# combine results
 rr2 = rbind(
   data.frame(as.list(coef(fit)),name="ridge"),
   data.frame(as.list(coef(fit2)),name="ols"),
     data.frame(as.list(coef(fit3)),name="true"))
 rr2$name = paste(rr2$name)
 
+# melt to plot
 rr3 = melt(rr2,id.vars = "name")
 rr3$var = as.integer(str_replace(rr3$variable,"X",""))
 ggplot(rr3,aes(x=var,y=value,color=name)) + geom_point() + geom_line() + theme_bw()
 
-# add the lasso regression
-X = array(rnorm(p2*n),c(n,p2));
-Y = X %*% c(beta,rep(0,p2-p)) + sigma*rnorm(n)
+ggplot(rr3,aes(x=var,y=value,color=name)) + geom_point() + geom_line() + theme_bw()
+
+```
+
+## Lasso
+
+We now minimize
+
+$$ \sum_{i=1}^n  \Big( Y_i - X_i \beta   \Big)^2 + \lambda \sum_p | \beta_p | $$
+
+```{r}
+# compute the Lasso with cross-validation
 cvfit <- glmnet::cv.glmnet(X, Y)
 
+# attach the results
 rr2 = rbind(rr2,rr2[1,])
 rr2[4,1:p2] =  as.matrix(coef(cvfit, s = "lambda.1se"))[2:(p2+1)]
 rr2$name[4] <- "lasso"
 
-rr3 = melt(rr2,id.vars = "name")
-rr3$var = as.integer(str_replace(rr3$variable,"X",""))
-rr3$var = rank(-abs(beta0),ties.method = "first" )[rr3$var]
+rr3 = data.table(melt(rr2,id.vars = "name"))
+rr3 <- rr3[,var:= as.integer(str_replace(rr3$variable,"X",""))]
 
-ggplot(rr3,aes(x=var,y=abs(value),color=name)) + geom_point(aes(size=name=="true")) + geom_line() + theme_bw()
-
-
+ggplot(rr3,aes(x=var,y=value,color=name)) +  geom_line() + theme_bw() +geom_point()
 ```
 
 
-# Applying to hitter database
+# Applying to Hitter database
 
 Borrowed from the book ISLR, Chapter 6 Lab 2: Ridge Regression and the Lasso
 
 ```{r}
 library(ISLR)
+# remove NA
 Hitters = Hitters[!is.na(Hitters$Salary),]
 
+library(corrgram) 
+corrgram(Hitters, order=TRUE, lower.panel=panel.shade,
+  upper.panel=panel.pie, text.panel=panel.txt)
+
+# prepare the data for glmnet
 x=model.matrix(Salary~.,Hitters)[,-1]
 y=Hitters$Salary
-
 ```
-
 
 
 ## Ridge Regression
 
 ```{r}
-library(glmnet)
+
+# prepare a grid for lambda
 grid=10^seq(10,-2,length=100)
 ridge.mod=glmnet(x,y,alpha=0,lambda=grid)
 
-dim(coef(ridge.mod))
-ridge.mod$lambda[50]
-coef(ridge.mod)[,50]
-sqrt(sum(coef(ridge.mod)[-1,50]^2))
-ridge.mod$lambda[60]
-coef(ridge.mod)[,60]
-sqrt(sum(coef(ridge.mod)[-1,60]^2))
+# dim(coef(ridge.mod)) # coef is 20x100
+coefs = t(as.array(coef(ridge.mod)[,seq(1,100,11)]))
+dt  = data.table(coefs)
+dt$lambda = log(ridge.mod$lambda[seq(1,100,11)])/log(10)
+
+knitr::kable(dt,digits = 4) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed","responsive"), full_width = F)
 ```
 
+## Using cross-validation with training and testing sets
+
 ```{r}
-predict(ridge.mod,s=50,type="coefficients")[1:20,]
+# split the sample in 2
 set.seed(1)
 train=sample(1:nrow(x), nrow(x)/2)
 test=(-train)
 y.test=y[test]
 
+# compute the ridge regression usign the train data
 ridge.mod=glmnet(x[train,],y[train],alpha=0,lambda=grid, thresh=1e-12)
-ridge.pred=predict(ridge.mod,s=4,newx=x[test,])
-mean((ridge.pred-y.test)^2)
-mean((mean(y[train])-y.test)^2)
 
-ridge.pred=predict(ridge.mod,s=1e10,newx=x[test,])
-mean((ridge.pred-y.test)^2)
+# compute the MSE on the test data for s=4
+dd = data.frame()
+for (l in grid) {
+  cc = predict(ridge.mod,s=l,newx=x[test,],type = "coefficients")
+  cmse = sum(cc[2:20,]^2)
+  ridge.pred=predict(ridge.mod,s=l,newx=x[test,])
+  v1=mean((ridge.pred-y.test)^2)
+  y.train=predict(ridge.mod,s=l,newx=x[train,])
+  v2=mean((mean(y[train])-y.train)^2)
+  dd = rbind(dd,data.frame(i=i,l=l,test=v1,train=v2,cmse=cmse))
+}
 
+ggplot(dd,aes(x=l,y=test)) + geom_line() + scale_x_log10()
+ggplot(dd,aes(x=l,y=train)) + geom_line() + scale_x_log10()
+ggplot(dd,aes(x=l,y=cmse)) + geom_line() + scale_x_log10()
+
+# compare the MSE for Rdige to mse for OLS
 ridge.pred=predict(ridge.mod,s=0,newx=x[test,])
 mean((ridge.pred-y.test)^2)
 
 lm(y~x, subset=train)
 predict(ridge.mod,s=0,type="coefficients")[1:20,]
 
+# use the library cross-validation
 set.seed(1)
 cv.out=cv.glmnet(x[train,],y[train],alpha=0)
 plot(cv.out)
+
+# get best lambda
 bestlam=cv.out$lambda.min
 bestlam
+
+# compute MSE at best
 ridge.pred=predict(ridge.mod,s=bestlam,newx=x[test,])
 mean((ridge.pred-y.test)^2)
-out=glmnet(x,y,alpha=0)
 
-predict(out,type="coefficients",s=bestlam)[1:20,]
+ridge_best = glmnet(x,y,alpha=0,lambda = bestlam)
+ridge_best = predict(ridge_best,type="coefficients",s=bestlam)[1:20,]
 
 ```
 
 ## The Lasso
 
 ```{r}
+# plot coefficients for all values of lambda
 lasso.mod=glmnet(x[train,],y[train],alpha=1,lambda=grid)
 plot(lasso.mod)
-set.seed(1)
+
+# plot the MSE for all coefficients
 cv.out=cv.glmnet(x[train,],y[train],alpha=1)
 plot(cv.out)
+
+# extract the best lambda in terms of cross-validation
 bestlam=cv.out$lambda.min
 lasso.pred=predict(lasso.mod,s=bestlam,newx=x[test,])
+
+# compute the MSE
 mean((lasso.pred-y.test)^2)
+
+# show only coefs different from 0
 out=glmnet(x,y,alpha=1,lambda=grid)
-lasso.coef=predict(out,type="coefficients",s=bestlam)[1:20,]
-lasso.coef
-lasso.coef[lasso.coef!=0]
+lasso_best=predict(out,type="coefficients",s=bestlam,alpha=1)[1:20,]
+lasso_best[lasso_best!=0]
 ```
 
+Let's compare the different parameters
 
+```{r}
+rrf = rbind(ridge_best,lasso_best)
+
+
+
+```
 
