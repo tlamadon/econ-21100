@@ -12,14 +12,14 @@ navbar:
     - text: "Labs"
       icon: fa-book     
       menu:
-        - text: "discrete choice"
+        - text: "Discrete choice"
           href: lab-discretechoice.html
-        - text: "dynamic choice"
+        - text: "Dynamic choice"
           href: lab-dynchoice.html
-        - text: "np-regression"
-          href: np-regression.html
-        - text: "Linear ridge"
+        - text: "Many regressors"
           href: linear-selection.html
+        - text: "non-param. regression"
+          href: np-regression.html
         - text: "Bootstrap"
           href: bootstrap.html
     - text: "Homeworks"
