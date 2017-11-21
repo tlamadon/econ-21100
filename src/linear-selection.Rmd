@@ -255,3 +255,68 @@ rrf = rbind(ridge_best,lasso_best)
 
 ```
 
+# PCA
+
+```{r}
+pca = prcomp(Hitters[,c('AtBat','Hits','HmRun','Runs','RBI','Walks','Years','CAtBat','CHits','CHmRun','CRuns','CRBI','CWalks','PutOuts','Assists','Errors')])
+
+X = as.matrix(Hitters[,c('AtBat','Hits','HmRun','Runs','RBI','Walks','Years','CAtBat','CHits','CHmRun','CRuns','CRBI','CWalks','PutOuts','Assists','Errors')])
+
+ee = eigen(t(X)%*%X)
+
+set.seed(1)
+A <- rnorm(500)
+B <- -1*A
+C <- 0.2*B -1.5*A
+pts <- cbind(X=rnorm(500,A,.05),Y=rnorm(500,B,.05),Z=rnorm(500,C,.05))
+pca2 = prcomp(pts)
+
+
+```
+
+
+# Kmeans
+
+```{r}
+library(tripack)
+library(RColorBrewer)
+
+set.seed(1)
+pts <- cbind(X=rnorm(500,rep(seq(1,9,by=2)/10,100),.022),Y=rnorm(500,.5,.15))
+plot(pts)
+
+km1 <- kmeans(pts, centers=5, nstart = 1, algorithm = "Lloyd",iter.max = 200)
+CL5 <- brewer.pal(5, "Pastel1")
+V <- voronoi.mosaic(km1$centers[,1],km1$centers[,2])
+P <- voronoi.polygons(V)
+plot(pts,pch=19,xlim=0:1,ylim=0:1,xlab="",ylab="",col=CL5[km1$cluster])
+points(km1$centers[,1],km1$centers[,2],pch=3,cex=1.5,lwd=2)
+plot(V,add=TRUE)
+
+set.seed(1)
+A <- c(rep(.2,100),rep(.2,100),rep(.5,100),rep(.8,100),rep(.8,100))
+B <- c(rep(.2,100),rep(.8,100),rep(.5,100),rep(.2,100),rep(.8,100))
+pts <- cbind(X=rnorm(500,A,.075),Y=rnorm(500,B,.075))
+
+
+```
+
+The nice thing about k-mean is that it will adapt to the complexitiy of the problem
+
+```{r}
+
+set.seed(1)
+A <- runif(500)
+B <- 0.5*A^10
+pts <- cbind(X=rnorm(500,A,.05),Y=rnorm(500,B,.05))
+
+km1 <- kmeans(pts, centers=5, nstart = 1, algorithm = "Lloyd",iter.max = 200)
+CL5 <- brewer.pal(5, "Pastel1")
+V <- voronoi.mosaic(km1$centers[,1],km1$centers[,2])
+P <- voronoi.polygons(V)
+plot(pts,pch=19,xlab="",ylab="",col=CL5[km1$cluster])
+points(km1$centers[,1],km1$centers[,2],pch=3,cex=1.5,lwd=2)
+plot(V,add=TRUE)
+
+
+```

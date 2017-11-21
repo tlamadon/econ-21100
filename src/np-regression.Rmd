@@ -65,7 +65,7 @@ ggplot(data,aes(x=x,y=kern_val2)) + geom_line() + geom_point(aes(y=y,alpha=kern_
 g <- function(x0,h) data[, sum( y * dnorm( (x-x0)/h))/sum( dnorm( (x-x0)/h)) ]
 
 data = data[, y_hat_kern := g(x,0.001),x]
-ggplot(data,aes(x=x,y=y)) + geom_point() + geom_line(aes(y=y_hat_kern),color="green",size=1) + geom_line(aes(y=yt),color="red",size=2) + 
+ggplot(data,aes(x=x,y=y)) + geom_point() + geom_line(aes(y=yt),color="red",size=2) +geom_line(aes(y=y_hat_kern),color="green",size=1) + 
    theme_bw()
 
 ```
@@ -111,14 +111,14 @@ Here we use a simple basis function approach.
 
 ```{r}
 require(splines)
-n = 10
-D = spline.des(seq(-0.2,1.2,l=n),x = data$x,outer.ok=TRUE)
+n = 50
+D = spline.des(seq(-0.2,1.2,l=n),x = data$x,outer.ok=TRUE,ord = 3)
 
 rr = data.frame(D$design)
 rr$x = data$x
 rr = melt(rr,id.vars = c("x"))
 
-ggplot(rr,aes(x=x,group=variable,y=value)) + geom_line() + theme_bw()
+ggplot(rr,aes(x=x,group=variable,y=value,color=factor(variable))) + geom_line() + theme_bw()
 
 ```
 
@@ -192,4 +192,6 @@ data = data[, F_hat := g(R_hat,h),R_hat]
 ggplot(data,aes(x=R_hat,y=F_hat)) + geom_line(color="red") + geom_line(aes(x=R,y=pnorm(R)),color="blue",linetype=2) + theme_bw()
 
 ```
+
+
 
