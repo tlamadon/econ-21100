@@ -60,6 +60,13 @@ ggplot(rr,aes(x=(value-lambda)/lambda)) + geom_density(fill="blue",alpha=0.2,col
   geom_vline(xintercept=lambda,linetype=2,color="red") +
   theme_bw()
 
+ggplot(rr,aes(x=(value))) + geom_density(fill="blue",alpha=0.2,color="blue") +
+  geom_density(aes(x=(valueb)),fill="red",alpha=0.2,color="red") + 
+  geom_density(aes(x=(valuea)),fill="green",alpha=0.2,color="green") + 
+  geom_vline(xintercept=lambda,linetype=2,color="red") +
+  theme_bw()
+
+
 ```
 
 
@@ -82,13 +89,14 @@ rr = data.table(foreach (i = 1:500,.combine=rbind) %do% {
     valueb[j] = boostest(D)
   }
   
-  res = data.frame(value=1/mean(D),value0=lambda,valueb=mean(valueb))
+  res = data.frame(value=1/mean(D),value0=lambda,valueb=mean(valueb),valuesd=sd(valueb))
   res$rep = i
   res$name = rownames(res)
   res
 })
 
-ggplot(rr,aes(x=value)) + geom_density(fill="blue",alpha=0.2,color="blue") + geom_vline(xintercept=lambda,linetype=2,color="red") + geom_vline(xintercept=rr[,mean(value)],linetype=2,color="blue")+
+ggplot(rr,aes(x=value)) + geom_density(fill="blue",alpha=0.2,color="blue") + geom_density(aes(x=valueb),fill="green",alpha=0.2,color="green") +
+ geom_vline(xintercept=lambda,linetype=2,color="red") + geom_vline(xintercept=rr[,mean(value)],linetype=2,color="blue")+
 geom_vline(xintercept=rr[,mean(valueb)],linetype=2,color="green")+
 geom_vline(xintercept=rr[,2*mean(value) - mean(valueb)],linetype=1,color="orange")+theme_bw()
 
@@ -96,3 +104,4 @@ geom_vline(xintercept=rr[,2*mean(value) - mean(valueb)],linetype=1,color="orange
 
 ```
 
+# Extract and compare standard errors 

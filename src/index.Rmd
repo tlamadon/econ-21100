@@ -2,7 +2,7 @@
 <br/><br/>
 This contains help files for the class _Econ 21130_ at University of Chicago. The corresponding github repository can be found [here](https://github.com/tlamadon/econ-21100), it is shared with my previous class. The class is taught by [T. Lamadon](http://www.lamadon.com). If you are a student, please sign up on the slack group. 
 
-<a class="btn btn-danger" href="https://chicago-econ-21130.slack.com/signup" role="button">Slack group</a>  <a class="btn btn-info" href="pdf/econ-21130-syllabus.pdf" role="button">Syllabus</a> <a class="btn btn-warning" href="pdf/econ-21130-notes.pdf" role="button">Notes</a>
+<a class="btn btn-danger" href="https://econ21130-w18.slack.com/signup" role="button">Slack group</a>  <a class="btn btn-info" href="pdf/econ-21130-syllabus.pdf" role="button">Syllabus</a> <a class="btn btn-warning" href="pdf/econ-21130-notes.pdf" role="button">Notes</a>
 
 
 <!-- Place this tag where you want the button to render. -->

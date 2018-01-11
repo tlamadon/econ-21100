@@ -1,0 +1,45 @@
+---
+title: "Homework on Dynamic choice"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+---
+
+The goal of this homework is to familiarize our-self with dynamic choice models. We are going to consider a simple case where agent choose to work or to not work. 
+
+In this simple model we are going to consider the effects of simple policies.
+
+# The model
+
+Individuals will differ in their producitivity that will denote $x$. We will use a discrete support for it. Each period will choose wether to work or not to work. Work will give payment $w = x \cdot a$ where $a$ is an aggregate state which my move stochastically.
+
+Finally transferring from unemployment to employment will only happen with a probability $\lambda$. 
+
+Our value function is then indexed by $a$, $x$  and the current working status $e$.
+
+Finally, we will consider an earning tax $\tau$ and an unemployment benefit $b$.
+
+```{r}
+p=list(r=0.05)
+
+```
+
+The Bellman equation can then be written as:
+
+$$V_1(x,a) = \log \exp \Big( a \cdot x \cdot w  +  \frac{1}{1+r} E_{a'}  V_0(x,a')      \Big) $$ 
+
+
+# solving the model
+
+```{r}
+
+
+```
+
+# simulating the model
+
