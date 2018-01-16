@@ -12,6 +12,8 @@ navbar:
     - text: "Labs"
       icon: fa-book     
       menu:
+        - text: "Labor supply"
+          href: lab-labor-supply.html
         - text: "Discrete choice"
           href: lab-discretechoice.html
         - text: "Dynamic choice"
