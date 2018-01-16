@@ -3,42 +3,55 @@ title: "Schedule"
 output: html_document
 ---
 
-You can download the notes for the class: <a class="btn btn-warning" href="pdf/econ-21130-notes.pdf" role="button">Notes</a>
+You can download the notes for the class:
 
+<a class="btn btn-warning" href="pdf/econ-21130-notes.pdf" role="button">Notes by methods</a> <a class="btn btn-success" href="pdf/econ-21130-applied.pdf" role="button">Notes by example</a>
+ 
 ## Class schedule
 
- - week 1: Probability review (see notes section 1) 
-    - [homework1 <i class="fa fa-external-link" aria-hidden="true"></i>](hw-probability.html)
- - week 2: Models, parameters and estimation (see notes section 2) 
- - week 3: OLS refresher (see notes section 3), 
-    - clustered standard errors [paper <i class="fa fa-external-link" aria-hidden="true"></i>](http://cameron.econ.ucdavis.edu/research/Cameron_Miller_JHR_2015_February.pdf) 
-    - error correlation Matrices in R [doc <i class="fa fa-external-link" aria-hidden="true"></i>](https://cran.r-project.org/web/packages/sandwich/vignettes/sandwich.pdf)
-    - [homework2 <i class="fa fa-external-link" aria-hidden="true"></i>](hw-inference.html)
- - week 4: Maximum Likelihood (see notes section 4)
-    - Multinomial choice  [Lab <i class="fa fa-external-link" aria-hidden="true"></i>](http://econ21130.lamadon.com/lab-discretechoice.html)
-    - EM Algorithm (see notes)
-    - Dynamic discrete choice (see notes section 4), Bus engine application [Rust87 <i class="fa fa-external-link" aria-hidden="true"></i>](http://people.hss.caltech.edu/~mshum/stats/rust.pdf)  and [Lab](http://econ21130.lamadon.com/lab-dynchoice.html)
- - week 5: Regression with many regressors (see notes section 5) & [Lab](http://econ21130.lamadon.com/linear-selection.html)
- - week 6: Application Lasso and peer effects [Manresa17 <i class="fa fa-external-link" aria-hidden="true"></i>](https://www.dropbox.com/s/erc8gr4yo0favyx/Manresa_2016_final.pdf?dl=0)
- - week 7: Non parametric regression (see notes section 6) & [Lab](http://econ21130.lamadon.com/np-regression.html)  
- - week 8: Heterogeneity, random effect model and EM algorithm (see notes section 9) 
- - week 9: Heterogeneity, fixed effect models (see notes section 10) 
- - week 10: Application to two-sided heterogeneity
+  - Linear models for cross-section (running example will be labor supply)
+    - Clarify concepts such as data, model, identification, estimation and inference
+    - Study theats to identification  (endogeneity, measurement error, simultaneity)
+    - Finite sample gaussian inference
+    - Asymptotic inference (central limit theorem)
+  - Topics on inference
+    - Bootstrap
+    - Relaxing strict i.i.d. assumption, need to adapt inference
+    - Thinking about multiple testing
+  - Linear model with panel data, parallel worlds 
+    - Possibility of using repeated measurements to alleviate/test threats mentioned before
+  - Multinomial decisions (we will use transportation and monopolistic competition)
+    - Introducing Maximum Likelihood Estimation
+    - Estimation of multinomial logit and applications
+    - Marriage market with Chow and Sia paper
+  - Unobserved heterogeneity
+    - Revisit multinomial problem and IIA 
+    - Random effect model and EM-algorithm
+  - Dynamic programing 
+    - Introducing Bellman equations (through cake eating problem)
+    - Study the estimation of dynamic programing (here we will cover the Bus engine problem of Rust)
+  - Topics in non-parametrics and high-dimensional econometrics
+    - model complexity and bias/variance trade-off
+    - many regressors (application to network of peers)
+    - non parametric regression
 
 ## Homeworks
 
-You can submit your homework either as solo or as a group of two. To submit your homework, create a channel in our slack group with a name starting with `grp_` and then with the initials of the members of your group. For instance the professor and myself would be `grp_tw`. Then please add the professor and myself as members of that group. You can make your group private if you don't want other students to see your homework.
+You can submit your homework either as solo or as a group of two. To communicate about your homework, create a channel in our slack group with a name starting with `grp_` and then with the initials of the members of your group. For instance the TA (Wooyong) and myself (Thibaut) would be `grp_tw`. Then please add the RA and myself as members of that group. You can make your group private if you don't want other students to see your homework. Submit the analytical parts directly to this slack group.
 
- - [Homework1](hw-probability.html) on probabilities and central limit theorem is due Wednesday Octover 11th before midnight
- - [Homework2](hw-inference.html) on inference
- - Hw3 on Maximum likelihood
- - TBD
+To submit your answers to computational homeworks. Please create a `git` repository (you can make it private), and add the RA and myself as contributor (in the case of private), or just share the URL with us if you choose to make the repo public. You can create your repository on [github](http://github.com) or [bitbucket](htpp://bitbucket.org), your choice!
+
+ - [Homework 1](pdf/hw1_w18.pdf) (analytical) is due next Monday, January the 22nd Midnight. 
 
 ## End of class project
 
- - 1 page proposal is due end of week 6.
+ - The project can be done in group of two. The goal is for you to take an economic or policy question and to develop a DGP for that question as well as a method adpated to ansering that question given the data. Through the project you should show the potential ptifalls of given methods.
+ - 1 page proposal is due end of week 7.
 
+## Midterm
 
+ - The midterm will be in week 6.
+ - I will be away during week 7 (the TA will use one of the classes to go over the exam answers).
 
 
 

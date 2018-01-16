@@ -2,15 +2,21 @@
 <br/><br/>
 This contains help files for the class _Econ 21130_ at University of Chicago. The corresponding github repository can be found [here](https://github.com/tlamadon/econ-21100), it is shared with my previous class. The class is taught by [T. Lamadon](http://www.lamadon.com). If you are a student, please sign up on the slack group. 
 
-<a class="btn btn-danger" href="https://econ21130-w18.slack.com/signup" role="button">Slack group</a> <a class="btn btn-warning" href="pdf/econ-21130-notes.pdf" role="button">Notes</a>
-
+<a class="btn btn-danger" href="https://econ21130-w18.slack.com/signup" role="button">Slack group</a>
 
 <!-- Place this tag where you want the button to render. -->
 <a class="github-button" href="https://github.com/tlamadon/econ-21100/archive/master.zip" data-icon="octicon-cloud-download" data-style="mega" aria-label="Download tlamadon/econ-21100 on GitHub">Download</a>  <a class="github-button" href="https://github.com/tlamadon/econ-21100/fork" data-icon="octicon-repo-forked" data-style="mega" data-count-href="/tlamadon/econ-21100/network" data-count-api="/repos/tlamadon/econ-21100#forks_count" data-count-aria-label="# forks on GitHub" aria-label="Fork tlamadon/econ-21100 on GitHub">Fork</a>
 
 ## Class overview
 
-This course focuses on micro-econometric methods that have applications to a wide range of economic questions. We study identification, estimation, and inference in both parametric and non-parametric models and consider aspects such as consistency, bias and variance of estimators. We discuss how repeated measurements can help with problems related to unobserved heterogeneity and measurement error, and how they can be applied to panel and network data. Topics include duration models, regressions with a large number of covariates, non-parametric regressions, and dynamic discrete choice models. Applications include labor questions such as labor supply, wage inequality decompositions and matching between workers and firms.  Students will be expected to solve programming assignment in R.
+The goal of the class is to get a better undertanding of the mapping between models, data and the evaluation of realized and un-realized policies. The course is organized around environments with precisely defined data generating process derived from models using economic theory in the presence of randomness. Given a DGP will then think through the lense of a researcher who might not know all the components of the generating process but is given access to data and wants to create an informed prediction for the effect of a given policy intervention. We will follow this procedure for several environments which will each highlight different challenges and solutions.
+
+The course focuses on micro-econometric methods that have applications to a wide range of economic questions. We study identification, estimation, and inference in both parametric and non-parametric models and consider aspects such as consistency, bias and variance of estimators. We discuss how repeated measurements can help with problems related to unobserved heterogeneity and measurement error, and how they can be applied to panel and network data. Topics include duration models, regressions with a large number of covariates, non-parametric regressions, and dynamic discrete choice models. Applications include labor questions such as labor supply, wage inequality decompositions and matching between workers and firms.  Students will be expected to solve programming assignment in R.
+
+For more details:
+
+  - see the [schedule](sched.html) 
+  - directly jump to one of the examples covered in class [labor supply](lab-labor-supply.html).
 
 ## Getting started with R {#start}
 
