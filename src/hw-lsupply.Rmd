@@ -1,0 +1,99 @@
+---
+title: "Homework on static labor supply"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(testthat)
+require(xtable)
+require(pander)
+```
+
+This homework builds on what we studied in class. We are going to simulate from the very simple model of labor supply we considered.
+
+The agent problem is
+
+$$
+\max_{c,h,e} c - \beta \frac{h^{1+\gamma}}{1+\gamma}\\
+\text{s.t. } c = e \cdot \rho \cdot w\cdot h +(1-e)\cdot r \cdot  h
+$$
+The individual takes his wage $w$ as given, he chooses hours of work $h$ and consumption $c$. He also chooses whether to work in the labor force or to work at home where he has an equivalent wage $r$.
+
+<span class="label label-success">Question 1</span> Do we expect to see any income effect given our model? What if we substituted $c$ in the utility for $\frac{c^{1+\eta}}{1+\eta}$?
+
+## Simulating data
+
+We are going to simulate a data set where agents will choose participation as well as the number of hours if they decide to work. This requires for us to specify how each of the individual specific variables are drawn. We then set the following:
+
+$$
+\begin{align*}
+\log W_i     &= \eta X_i + u_i  \\
+\log R_i     &= \log W_i + \delta Z_i + \xi_i \\
+\log \beta_i &= X_i +  a \xi_i +\epsilon_i  \\
+\end{align*}
+$$
+
+and finally $(X_i,Z_i,\epsilon_i,u_i,\xi_i)$ are independent normal draws. Given all of this we can simulate our data. 
+
+<span class="label label-success">Question 2</span> What does the $a$ parameter capture here?
+
+```{r, results='hide'}
+p  = list(gamma = 0.8,beta=1,a=1,rho=1,eta=0.3,delta=0.3,delta0=-0.3) # parameters
+N=10000  # size of the simulation
+simdata = data.table(i=1:N,X=rnorm(N))
+
+# simulating variables
+simdata[,X := rnorm(N)*0.2]
+simdata[,u := rnorm(N)*0.2]
+simdata[,lw := p$eta*X  + u ]  # log wage
+
+simdata[,Z := rnorm(N)*0.2]
+simdata[,xi:=rnorm(N)*0.2]
+simdata[,lr := p$delta0 + p$delta*Z + xi]; # log home productivity
+
+simdata[,eps:=rnorm(N)*0.2]
+simdata[,beta := exp(X  + p$a*xi + eps)]; # heterogenous beta coefficient
+
+# compute decision variables
+simdata[, lfp := lw >= lr] # labor force participation
+simdata[, h   := (p$rho * exp(lw)/beta)^(1/p$gamma)] # hours
+simdata[lfp==FALSE,h:=NA][lfp==FALSE,lw:=NA]
+
+```
+
+We have now our simulated data. 
+
+<span class="label label-success">Question 3</span> Simulate data with $a=0$ and $a=1$. Comment on the value of the coefficient of the regression of log hours on log wage and X.
+
+
+```{r}
+pander(summary(simdata[,lm(log(h) ~ lw  + X)]))
+```
+
+## Heckman correction
+
+As we have seen in class, Heckman (74) offers a way for us to correct the our regression in order to recover our structural parameters. 
+
+As we have seen in class, we need to understand how the error term in the hour regression correlates with the labor participation decision. 
+
+<span class="label label-success">Question 4</span> Following what we did in class, and using the class note, derive the expression for the Heckman correction term as a function of known parameters. In other words, derive $E( a \xi_i + \epsilon_i | lfp=1)$.
+
+Construction of this epxression requires us to recover the parameters $\delta/\sigma_xi,\delta_0/\sigma_xi$. We can get these by running a probit of participation on $Z_i$. 
+
+```{r}
+fit2 = glm(lfp ~ Z,simdata,family = binomial(link = "probit"))
+```
+
+<span class="label label-success">Question 5</span> Check that the regression does recover correctly the coefficients. Use them to construct the inverse Mills ratio. Use the correction you created and show that the regression with this extra term delivers the correct estimates for $\gamma$ even in the case where $a\neq 0$.
+
+
+
+
+
