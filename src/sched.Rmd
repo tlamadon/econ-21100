@@ -14,6 +14,9 @@ You can download the notes for the class:
     - Study theats to identification  (endogeneity, measurement error, simultaneity)
     - Finite sample gaussian inference
     - Asymptotic inference (central limit theorem)
+    - Heckman (77)  [paper <i class="fa fa-external-link" aria-hidden="true"></i>](http://www.nber.org/papers/w0172)
+    - Saez (99) [paper <i class="fa fa-external-link" aria-hidden="true"></i>](https://eml.berkeley.edu/~saez/saezAEJ10bunching.pdf) and [slides <i class="fa fa-download" aria-hidden="true"></i> ](pdf/slides-laborsupply-kink-ug.pdf)
+    - Blundell, Duncan and Meghir (98) [paper <i class="fa fa-external-link" aria-hidden="true"></i>](https://www.jstor.org/stable/2999575) and [slides <i class="fa fa-download" aria-hidden="true"></i> ](pdf/slides-laborsupply-bdm-ug.pdf)
   - Topics on inference
     - Bootstrap
     - Relaxing strict i.i.d. assumption, need to adapt inference
