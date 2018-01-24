@@ -42,6 +42,7 @@ You can submit your homework either as solo or as a group of two. To communicate
 To submit your answers to computational homeworks. Please create a `git` repository (you can make it private), and add the RA and myself as contributor (in the case of private), or just share the URL with us if you choose to make the repo public. You can create your repository on [github](http://github.com) or [bitbucket](htpp://bitbucket.org), your choice!
 
  - [Homework 1](pdf/hw1_w18.pdf) (analytical) is due next Monday, January the 22nd Midnight. 
+ - [Homework 2](hw-lsupply.html) (computer) is due next Wednesday, January the 31nd Midnight. You need to submit this homework using git.
 
 ## End of class project
 

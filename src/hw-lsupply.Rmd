@@ -34,9 +34,9 @@ We are going to simulate a data set where agents will choose participation as we
 
 $$
 \begin{align*}
-\log W_i     &= \eta X_i + u_i  \\
-\log R_i     &= \log W_i + \delta Z_i + \xi_i \\
-\log \beta_i &= X_i +  a \xi_i +\epsilon_i  \\
+\log W_i     &= \eta X_i + Z_i + u_i  \\
+\log R_i     &= \delta_0 + \log(W_i) + \delta Z_i + \xi_i \\
+\log \beta_i &= X_i +\epsilon_i +  a \xi_i   \\
 \end{align*}
 $$
 
@@ -45,27 +45,27 @@ and finally $(X_i,Z_i,\epsilon_i,u_i,\xi_i)$ are independent normal draws. Given
 <span class="label label-success">Question 2</span> What does the $a$ parameter capture here?
 
 ```{r, results='hide'}
-p  = list(gamma = 0.8,beta=1,a=1,rho=1,eta=0.3,delta=0.3,delta0=-0.3) # parameters
+p  = list(gamma = 0.8,beta=1,a=1,rho=1,eta=0.2,delta=-0.2,delta0=-0.1,nu=0.5) # parameters
 N=10000  # size of the simulation
 simdata = data.table(i=1:N,X=rnorm(N))
 
 # simulating variables
-simdata[,X := rnorm(N)*0.2]
-simdata[,u := rnorm(N)*0.2]
-simdata[,lw := p$eta*X  + u ]  # log wage
+simdata[,X := rnorm(N)]
+simdata[,Z := rnorm(N)]
+simdata[,u := rnorm(N)]
+simdata[,lw := p$eta*X  + Z + 0.2*u ]  # log wage
 
-simdata[,Z := rnorm(N)*0.2]
-simdata[,xi:=rnorm(N)*0.2]
-simdata[,lr := p$delta0 + p$delta*Z + xi]; # log home productivity
+simdata[,xi := rnorm(N)*0.2]
+simdata[,lr := lw + p$delta0+ p$delta*Z + xi]; # log home productivity
 
 simdata[,eps:=rnorm(N)*0.2]
-simdata[,beta := exp(X  + p$a*xi + eps)]; # heterogenous beta coefficient
+simdata[,beta := exp(p$nu*X  + p$a*xi + eps)]; # heterogenous beta coefficient
 
 # compute decision variables
-simdata[, lfp := lw >= lr] # labor force participation
+simdata[, lfp := log(p$rho) + lw >= lr] # labor force participation
 simdata[, h   := (p$rho * exp(lw)/beta)^(1/p$gamma)] # hours
 simdata[lfp==FALSE,h:=NA][lfp==FALSE,lw:=NA]
-
+simdata[,mean(lfp)]
 ```
 
 We have now our simulated data. 
@@ -73,9 +73,7 @@ We have now our simulated data.
 <span class="label label-success">Question 3</span> Simulate data with $a=0$ and $a=1$. Comment on the value of the coefficient of the regression of log hours on log wage and X.
 
 
-```{r}
-pander(summary(simdata[,lm(log(h) ~ lw  + X)]))
-```
+
 
 ## Heckman correction
 
@@ -92,6 +90,20 @@ fit2 = glm(lfp ~ Z,simdata,family = binomial(link = "probit"))
 ```
 
 <span class="label label-success">Question 5</span> Check that the regression does recover correctly the coefficients. Use them to construct the inverse Mills ratio. Use the correction you created and show that the regression with this extra term delivers the correct estimates for $\gamma$ even in the case where $a\neq 0$.
+
+## Repeated cross-section
+
+Lastly we want to replicate the approach of Blundell, Duncan and Meghir. To justify such an appraoach we are going to include an additional endogeneity concern between the wage and the disutility of hours of worked. We want to do the following:
+
+ 1. add the wage residual $u_i$ inside the expression for $\beta_i$ (similar to the $\xi$ term)
+ 2. simulate 2 data-sets (two different cross-sections, redraw everything). However in the second cross-section change the $rho$ to 1.2
+
+Our final step is then to try to recover the wage elasticty by differencing across periods usig the tax variation. To do so, we need to compute time specific Mills ratios. 
+
+<span class="label label-success">Question 6</span> Why do we need to estimate the parameters of the selection equation separatly for each period? 
+
+<span class="label label-success">Question 7</span> Create the heckman correction term for each observation in each period. Then cut the X into a few values (picking some threshold). Finally compute all first difference in the time dimension (including the mills ratio difference). Finally run the regression using the different group as obervations and the difference as variables. Do this allow to recover the correct $\gamma$?
+
 
 
 
