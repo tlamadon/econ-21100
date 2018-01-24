@@ -1,0 +1,165 @@
+---
+title: "ECON 21130 - R markdown tutorial"
+author: "Wooyong Lee"
+output: html_document
+header-includes:
+- \usepackage{amsfonts,amssymb,amsmath}
+---
+<!-- customize the title and the author in the above code -->
+
+This is a tutorial for R markdown. It also serves as a sample R markdown code. Please check the source code of this document.
+
+
+# What is R markdown?
+
+- Think of it as a source code for creating a webpage that can embed R code
+- You write a source code and "compile" it to create a webpage
+
+
+# Creating an R markdown document
+
+In RStudio, click **File -> New File -> R Markdown...**.
+
+RStudio will create a skeleton file with some basic explanations. Read those.
+
+You can compile the source code into HTML or PDF. I recommend HTML because it can adjust fontsize, linebreak, etc. according to the device.
+
+
+# R markdown cheatsheet
+
+- First of all, check the R markdown cheatsheet:
+https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf
+
+- Especially, 
+check **3. Markdown**.
+
+- It covers most of 
+what you need to know to write plain text
+
+<!-- as in the cheatsheet, '*' also works for the unordered list -->
+
+
+# LaTeX
+
+If you know LaTeX, a popular language for writing academic documents, you can use it in R markdown.
+
+R markdown understands LaTeX syntax --- just write them.
+
+<!-- if you are familiar with LaTeX and want to use LaTeX packages in R markdown, include them in the "header-includes" declaration in the header as in this document -->
+
+For the class, we use it to write math symbols and equations, which we discuss below.
+
+
+# Writing math symbols and equations
+
+Please check the source code of this document to see how to write math equations.
+
+### Examples - read the source code!
+
+<!-- $$ and $$ displays a math equation in a separate line -->
+
+Pythagorean theorem.
+
+$$
+  a^2 + b^2 = c^2
+$$
+
+<!-- $...$ creates an inline math expression -->
+
+Arithmetic mean $\geq$ Geometric mean $\geq$ Harmonic mean.
+
+$$
+  \frac{1}{n}\sum_{i=1}^N X_i \geq \left( \prod_{i=1}^N X_i \right)^{1/N} \geq \frac{1}{\sum_{i=1}^N 1/X_i}.
+$$
+
+Greek letters, plain texts and multiple lines.
+
+$$
+  \begin{aligned}
+  line 1 &= \alpha + \beta   \\
+  \text{plain text} &= \gamma + \delta  \\
+  line 3 &= \lambda + \sigma \\
+  \textbf{bold plain text} &= \Lambda + \Sigma
+  \end{aligned}
+$$
+
+Caligraphic, blackboard bold and bold.
+$$
+  \mathcal{F}, \mathbb{F}, \mathbf{F}.
+$$
+
+If you need a math symbol but you don't know what to type, go to http://detexify.kirelabs.org/classify.html and draw the symbol using your mouse! For example, you can draw $\pm$ there and see that the command is "pm".
+
+
+# Embedding R
+
+- The main advantage of using R markdown is that we can run R within the document.
+
+- In other words, we can alternate between plain text and R code.
+
+- In terms of homework submission, this is handy because you don't need to separately submit the code or copy the R output into the document.
+
+Below is an example of the R code (which we shall call "chunk") run within the document.
+
+```{r}
+Sys.setenv(lang="EN") ### this command sets the R locale to English ###
+courseNo = "ECON 21130"
+print(courseNo)
+```
+
+- Note that it displays not only the code but also the result.
+
+- Also, the R chunks are cumulative; that is, the variable `courseNo` defined in the above can be used in the later chunks. 
+
+Below is an example.
+
+```{r}
+courseTitle = "Topics in Microeconometrics"
+print(paste(courseNo, courseTitle, sep = " - "))
+```
+
+- R markdown offers options to configure how the R chunks are displayed. For example, you can decide whether to hide the code, whether to hide the result, whether to display the error message, etc.
+
+- For a list of such options, check **5. Embed code** of the R markdown cheatsheet.
+
+- For example, `eval=FALSE` option tells R to not execute the code.
+
+Below is an example.
+
+```{r, eval=FALSE}
+ROOT2 = 1.414
+```
+
+In the above chunk, I specified `eval=FALSE` option. So the above chunk is not executed, which means `ROOT2` is not defined.
+
+In the below chunk, we can confirm that `ROOT2` is not defined.
+
+```{r, error=TRUE}
+print(ROOT2)
+```
+
+If you check the source code of this document, you will notice that I specified `error=TRUE` in the above chunk. 
+
+You must specify this option if you want R to print the error message. Otherwise the source code will not be compiled into the HTML document due to the error.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
