@@ -41,7 +41,7 @@ This is a tutorial for Git. We focus on the features necessary for homework subm
 - **commit** is a procedure that records the history of the source code
 - Git records history of all the changes that are made for the source code, like below:
 
-![](Githistory.png)
+![](TA-Githistory.png)
 
 - To update the remote storage, you first **commit** to record these changes and then **push**.
 - When you **commit**, you can add comments to describe the changes made.
