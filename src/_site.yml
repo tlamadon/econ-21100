@@ -1,56 +1,53 @@
-name: 'Econ 21130 '
-output_dir: ../docs
+name: "Econ 21130 "
+output_dir: "../docs"
 navbar:
-  title: Econ 21130
+  title: "Econ 21130"
   left:
-  - text: Home
-    icon: fa-home
-    href: index.html
-  - text: Sched
-    icon: fa-calendar
-    href: sched.html
-  - text: Labs
-    icon: fa-book
-    menu:
-    - text: Labor supply
-      href: lab-labor-supply.html
-    - text: Discrete choice
-      href: lab-discretechoice.html
-    - text: Dynamic choice
-      href: lab-dynchoice.html
-    - text: Many regressors
-      href: linear-selection.html
-    - text: non-param. regression
-      href: np-regression.html
-    - text: Bootstrap
-      href: bootstrap.html
-  - text: Homeworks
-    icon: fa-truck
-    menu:
-    - text: 1 Probability
-      href: hw-probability.html
-    - text: 2 Inference
-      href: hw-inference.html
-  - text: TA notes
-    icon: fa-paw
-    menu:
-    - text: R tutorial
-      href: Rtutorial.html
-    - text: R regression
-      href: Rregression.html
+    - text: "Home"
+      icon: fa-home      
+      href: index.html
+    - text: "Sched"
+      icon: fa-calendar      
+      href: sched.html
+    - text: "Labs"
+      icon: fa-book     
+      menu:
+        - text: "Labor supply"
+          href: lab-labor-supply.html
+        - text: "Discrete choice"
+          href: lab-discretechoice.html
+        - text: "Dynamic choice"
+          href: lab-dynchoice.html
+        - text: "Many regressors"
+          href: linear-selection.html
+        - text: "non-param. regression"
+          href: np-regression.html
+        - text: "Bootstrap"
+          href: bootstrap.html
+    - text: "Homeworks"
+      icon: fa-truck     
+      menu:
+        - text: "1 Labor supply"
+          href: hw-lsupply.html
+        - text: "2 Inference"
+          href: hw-inference.html
+    - text: "TA notes"
+      icon: fa-paw     
+      menu:
+        - text: "R tutorial"
+          href: Rtutorial.html
+        - text: "R regression"
+          href: Rregression.html
   right:
-  - icon: fa-github
-    href: https://github.com/tlamadon/econ-21100
-  - icon: fa-bug
-    href: https://github.com/tlamadon/econ-21100/issues
+    - icon: fa-github
+      href: https://github.com/tlamadon/econ-21100
+    - icon: fa-bug
+      href: https://github.com/tlamadon/econ-21100/issues
 output:
   html_document:
     theme: cosmo
     highlight: textmate
     include:
       after_body: footer.html
-      in_header: header.html
+      in_header:  header.html
     css: styles.css
-    lib_dir: site_libs
-    self_contained: no
-

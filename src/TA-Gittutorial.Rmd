@@ -1,0 +1,96 @@
+---
+title: "ECON 21130 - Git tutorial"
+author: "Wooyong Lee"
+output: html_document
+header-includes:
+- \usepackage{amsfonts,amssymb,amsmath}
+---
+<!-- customize the title and the author in the above code -->
+
+This is a tutorial for Git. We focus on the features necessary for homework submission.
+
+
+# What is Git?
+
+- It is a **version control** system.
+- A cloud storage that is specialized for developing and maintaining source codes.
+- Especially useful when developing the codes as a team.
+
+# For the homework submission...
+
+- You may use git as another Dropbox or Google Drive
+- which means you do everything in a traditional way and then just use git to upload the final version.
+- That is fine for the class.
+- Of course you can try using features of git.
+- For example, if you do the homework as a pair, you may use git to collaborate.
+
+# Git workflow (example)
+
+1. Create the remote (i.e. cloud) storage and **clone** it with the local storage in your computer.
+
+2. Make changes in the local storage and then **push** the changes to the remote storage.
+
+3. In other machines, **pull** any changes from the remote storage to update the local storage.
+
+  + Then make further changes in the local storage, and then **push** the changes to the remote storage.
+
+
+# Commit and push
+
+- In Step 2 of the above, git requires to **commit** the changes before we **push** the changes to the remote storage.
+- **commit** is a procedure that records the history of the source code
+- Git records history of all the changes that are made for the source code, like below:
+
+![](TA-Githistory.png)
+
+- To update the remote storage, you first **commit** to record these changes and then **push**.
+- When you **commit**, you can add comments to describe the changes made.
+
+
+# Branch
+
+- When developing the code, we may want to try various revisions from the current version.
+- Git is able to track multiple lines of histories originating from one node, which we call **branches**.
+- It is useful when someone wants to develop the code differently from the mainstream branch, the **master** branch.
+
+- **Branching** also happens when multiple members try to update the same file at the same time.
+- Git assigns members to different branches to resolve the updating problem.
+- If the team wants to apply the changes in a branch into the **master** branch, they can **merge** the branch.
+
+- For simple tasks like writing the homework, you would simply use the **master** branch.
+
+
+
+# Using Git
+
+- In principle, Git uses console commands.
+- That means we type something like the following 
+to do the tasks described in the workflow: 
+```{r, eval=FALSE}
+git commit -m "first draft of HW1"
+git push origin master
+```
+
+- If you dislike this, you can use GUI applications that helps you to do these by clicking buttons.
+- I personally use Sourcetree, which is free, but of course you can use other applications.
+- As long as you understand the concept of **commit**, **push**, **pull**, etc., you would have no problem using these GUI applications.
+
+- To use git, you need accounts from Github or Bitbucket. Create an account.
+- Even with GUI applications, creating a remote storage may require you to specify things that you have no idea. In that case, go to the website of Github or Bitbucket and create a remote storage in the website.
+- Then you would have no problem **cloning** the remote storage into your computer using the GUI applications.
+- Once you **clone** the storage, you can now **commit**, **push** and **pull** the changes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
