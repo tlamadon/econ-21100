@@ -18,8 +18,6 @@ You can download the notes for the class:
     - Bootstrap
     - Relaxing strict i.i.d. assumption, need to adapt inference
     - Thinking about multiple testing
-  - Linear model with panel data, parallel worlds 
-    - Possibility of using repeated measurements to alleviate/test threats mentioned before
   - Multinomial decisions (we will use transportation and monopolistic competition)
     - Introducing Maximum Likelihood Estimation
     - Estimation of multinomial logit and applications
@@ -34,6 +32,8 @@ You can download the notes for the class:
     - model complexity and bias/variance trade-off
     - many regressors (application to network of peers)
     - non parametric regression
+  - Linear model with panel data, parallel worlds 
+    - Possibility of using repeated measurements to alleviate/test threats mentioned before
 
 ## Homeworks
 
