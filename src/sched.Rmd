@@ -20,7 +20,7 @@ You can download the notes for the class:
     - [Lab <i class="fa fa-external-link" aria-hidden="true"></i>](lab-labor-supply.html) on labor supply 
   - Topics on inference
     - Bootstrap
-    - Relaxing strict i.i.d. assumption, need to adapt inference
+    - Clustering of standard errors, Cameron and Miller guide [paper <i class="fa fa-external-link" aria-hidden="true"></i>](http://cameron.econ.ucdavis.edu/research/Cameron_Miller_JHR_2015_February.pdf)
     - Thinking about multiple testing
   - Multinomial decisions (we will use transportation and monopolistic competition)
     - Introducing Maximum Likelihood Estimation
@@ -34,7 +34,9 @@ You can download the notes for the class:
     - Random effect model and EM-algorithm
   - Dynamic programing 
     - Introducing Bellman equations (through cake eating problem)
-    - Study the estimation of dynamic programing (here we will cover the Bus engine problem of Rust)
+    - Study the estimation of dynamic programing 
+    - Rust (74) [paper <i class="fa fa-external-link" aria-hidden="true"></i>](http://people.hss.caltech.edu/~mshum/stats/rust.pdf)
+    - [Lab <i class="fa fa-external-link" aria-hidden="true"></i>](lab-labor-supply.html) on dynamic discrete choice 
   - Topics in non-parametrics and high-dimensional econometrics
     - model complexity and bias/variance trade-off
     - many regressors (application to network of peers)

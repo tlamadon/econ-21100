@@ -1,0 +1,123 @@
+---
+title: "Homework on unobserved heterogeneity"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r,echo=FALSE,results=FALSE}
+if (file.exists("../../src/hw-hetero-sol.R")) source("../../src/hw-hetero-sol.R")
+if (file.exists("../src/hw-hetero-sol.R")) source("../src/hw-hetero-sol.R")
+```
+
+In this this homework, we are going to consider a simple model of unobserved heterogeneity. We will do this through the lense of unemployment duration.
+
+# A simple model
+
+We index individual by $i$ and we suppose that we observe their unemployment spell. Each period the unemployed individual chooses how much effort to put into searching for work. This effort affects the probability $\lambda_i$ of getting a job offer at wage $W_i$. The cost to achieve arrival probability is given by $c(\lambda_i)$. When he accecpts the job, we assume that the worker keeps the job for ever. The discount rate is $r$ and we will consider $r \rightarrow 0$.
+
+The value of finding a job is given by $V_e = \frac{\rho W}{r}$. Where $\rho$ captures the tax system. The unemployed worker Bellman equation is then given by
+
+$$
+\begin{align}
+V_u & = \max_\lambda b_i - c(\lambda)  + \lambda_i \frac{\rho W}{(1+r) r} + \frac{1-\lambda_i}{1+r} V_u
+\end{align}
+$$
+<span class="label label-success">Question 1</span> show that for a fixed  $\lambda$ we can write:
+
+$$  V_u =  \frac{1+r}{r+\lambda} \Big( b - c(\lambda) + \lambda \frac{\rho W}{(1+r) r} \Big) $$
+
+We are going to assume that $c(\lambda) = \frac{a}{\gamma}  \lambda^{(1+\gamma)}$. 
+
+<span class="label label-success">Question 2</span> Show that taking the first order condition on the effort decision, and taking the limit $r \rightarrow 0$, gives the following optimal choice for $\lambda$:
+
+$$ \lim_{r \rightarrow 0} \lambda = \Big(  \frac{\rho W - b}{a}\Big)^{\frac{1}{1+\gamma}} $$
+
+## Simulating data
+
+We draw wages from a log-nornmal distribution and attach the $\lambda$ we derived previously.
+
+```{r}
+p = list(rho=0.9,a = 3, gamma =1.5)
+p$n = 1000
+data = data.table(B = 0, W = exp(rnorm(p$n) -3))
+
+# solve for lambda
+data[, Lb := ((p$rho*W - B)/(p$a))^(1/(1+p$gamma))]
+data[, Lb := pmin(Lb,pmax(Lb,0),1)]
+
+ggplot(data,aes(x=W,y=Lb)) + geom_line() + theme_bw()
+```
+
+## Estimating
+
+In this first section we coinsider the simple case where all individuals are homogenous. We are interested in estimating $a,\gamma$. 
+
+<span class="label label-success">Question 3</span> Write down a function that computes the likelihood of a given data $D,W$. Evaluate your likelihood for a grid on $a,\gamma$ around the truth and show that the max is around the true value.
+
+```{r}
+lik.homo(data$W,data$D,p)
+```
+
+We note that the MLE estimator of $a$ for a given value of $\gamma$ admits a close form solution.
+
+<span class="label label-success">Question 4</span> Derive the FOC condition for $a$ from the likelihood expression, and find a close form solution for the solution. 
+
+
+# Random Effect
+
+In this section we want to allow for individuals to have different values of $a$. We assume that the population is devided in $K$ groups, each having their own $a_k$ parameter. We are going to only use $K=3$.
+
+Simulating data is as simple as before:
+
+```{r}
+p = list(rho=0.9,a = c(1,3,5), gamma =1.5, pk=c(0.2,0.5,0.3))
+
+p$n = 1000
+data = data.table(B = 0, W = exp(rnorm(p$n) -2))
+
+# draw the latent type
+data[, k := sample.int(3,.N,prob = p$pk,replace=T)]
+
+# solve for lambda
+data[, Lb := ((p$rho*W - B)/(p$a[k]))^(1/(1+p$gamma))]
+data[, Lb := pmin(Lb,pmax(Lb,0),1)] # bound it between 0 and 1
+
+```
+
+<span class="label label-success">Question 5</span> write down a function that computes the liklihood of the data given our random effect model. Show that this likelihood picks close to the true value of $\gamma,a_1,a_2,a_3,p_1,p_2,p_3$ by varying each parameter separatly and reporting the likelihood (the $p$ parameters need to sum to 1).
+
+
+Here, I would like for you to write the EM algorithm to recover the different types. We are going to write an Em to recover the $a_k$ for a given $\gamma$. Start with the true value of $gamma$ for now. You need write code that:
+
+ 1. E-step: compute the posterior probability for each individual to be of type i
+ 2. M-step: code that computes the $a_k$ parameters. You can use the close form you derived at the begining to do that. 
+
+<span class="label label-success">Question 6</span> write down a function performs the EM estimation for a fixed value of $\gamma$.
+
+Within each EM step, the likelihood has to be going up, otherwise it means that you have a an error.
+
+<span class="label label-success">Question 7</span> wrap your EM algorithm in a grid over $\gamma$. You should be nicely picking at the true $\gamma$.
+
+# Fixed Effect
+
+We could also have tried a fixed effect approach, where we directly use the duration as a measurement of the true lambda. In the Fixed Effect world, we estimate an $a_i$ per individual. For a given individual you only have one $D_i,W_i$. Still however, you can write the MLE estimate of $a_i$ using the same formula that you derived at the begining of the homework.
+
+We can try to maximize the overall likelihood using FE parameters $a_i$ by applying the following procedure:
+
+ 1. for a given value of $\gamma$ compute the MLE estimate of $a_i$ 
+ 2. evaluate the likelihood at the value of $\gamma$
+ 3. do this for a grid of $\gamma$ and report what seems to be the highest value.
+ 
+<span class="label label-success">Question 6</span> Implement this in a function, report the estimate of $\gamma$ that it returns (please actually report a curve over $\gamma$).
+
+
+
+
