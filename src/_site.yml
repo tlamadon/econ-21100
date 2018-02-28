@@ -20,17 +20,23 @@ navbar:
       href: lab-dynchoice.html
     - text: Many regressors
       href: linear-selection.html
-    - text: non-param. regression
+    - text: NP regression
       href: np-regression.html
     - text: Bootstrap
       href: bootstrap.html
   - text: Homeworks
     icon: fa-truck
     menu:
-    - text: 1 Labor supply
+    - text: OLS and endogeneity
+      href: pdf/hw1_w18.pdf
+    - text: Labor supply
       href: hw-lsupply.html
-    - text: 2 Inference
+    - text: Inference
       href: hw-inference.html
+    - text: MLE and OLS
+      href: pdf/hw4_w18.pdf
+    - text: Heterogeneity
+      href: hw-hetero.html
   - text: TA notes
     icon: fa-paw
     menu:

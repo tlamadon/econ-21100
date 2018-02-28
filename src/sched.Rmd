@@ -54,7 +54,7 @@ To submit your answers to computational homeworks. Please create a `git` reposit
  - [Homework 2](hw-lsupply.html) (computer) is due Wednesday, January the 31nd, Midnight.
  - [Homework 3](hw-inference.html) (computer) is due Wednesday, February 7th, Midnight.
  - [Homework 4](pdf/hw4_w18.pdf) (analytical) is due Thursday, Ferbruary 16th. 
- - [Homework 5] to be announced. 
+ - [Homework 5](hw-hetero.html) (computer) is due Friday, March 9th, Midnight.
  
 ## End of class project
 
