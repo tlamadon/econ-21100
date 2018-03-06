@@ -119,7 +119,7 @@ We can try to maximize the overall likelihood using FE parameters $a_i$ by apply
  2. evaluate the likelihood at the value of $\gamma$
  3. do this for a grid of $\gamma$ and report what seems to be the highest value.
  
-<span class="label label-success">Question 6</span> Implement this in a function, report the estimate of $\gamma$ that it returns (please actually report a curve over $\gamma$). Use the following code to generate data. Comment on the result.
+<span class="label label-success">Question 8</span> Implement this in a function, report the estimate of $\gamma$ that it returns (please actually report a curve over $\gamma$). Use the following code to generate data. Comment on the result.
 
 ```{r}
 p = list(rho=0.9, gamma =1.5)
@@ -137,7 +137,7 @@ data[, Lb := pmin(pmax(Lb,0),1)] # bound it between 0 and 1
 data[, D := rexp(p$n, rate = Lb)]
 ```
 
-<span class="label label-success">Question 7 (bonus) </span> Repeat the fixed-effect approach for the case that we observe two sets of wage and unemployment duration. Specifically, we generate the data by the following code.
+<span class="label label-success">Question 9 (bonus) </span> Repeat the fixed-effect approach for the case that we observe two sets of wage and unemployment duration. Specifically, we generate the data by the following code.
 
 ```{r}
 p = list(rho=0.9, gamma =1.5)
