@@ -125,13 +125,13 @@ We can try to maximize the overall likelihood using FE parameters $a_i$ by apply
 p = list(rho=0.9, gamma =1.5)
 
 p$n = 1000
-data = data.table(B = 0, W1 = exp(rnorm(p$n) -2), W2 = exp(rnorm(p$n) -2))
+data = data.table(B = 0, W = exp(rnorm(p$n) -2))
 
 # draw the latent type
 data[, a := runif(p$n, min=0.5, max=2.5)]
 
 # solve for lambda
-data[, Lb := ((p$rho*W1 - B)/a)^(1/(1+p$gamma))]
+data[, Lb := ((p$rho*W - B)/a)^(1/(1+p$gamma))]
 data[, Lb := pmin(pmax(Lb,0),1)] # bound it between 0 and 1
 
 data[, D := rexp(p$n, rate = Lb)]
