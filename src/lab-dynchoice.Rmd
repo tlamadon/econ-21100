@@ -86,14 +86,14 @@ P      = exp(-0.01*x)
 In = c(2:n,n)
 
 rr = data.frame()
-for (i in 1:100) {
+for (i in 1:300) {
   rr = rbind(rr,data.frame(x=x,V=V,rep=i,v1=P + lambda*beta*V[In],v2=-C + beta*V[1] ))
   V2 = log( exp( P + lambda*beta*V[In]) +  exp(-C + beta*V[1] )  ) + 0.56
   dist = mean((V2-V)^2)
   V=V2
 }
 rr = data.table(rr)
-ggplot(rr[rep<7],aes(x=x,y=V,group=rep,color=factor(rep))) + 
+ggplot(rr[rep<100],aes(x=x,y=V,group=rep,color=factor(rep))) + 
   geom_line()
 
 
@@ -154,7 +154,7 @@ for (i in 1:100) {
 
 data = data.table(rr)
 data[,sum(l==1),i][,mean(V1)]
-ggplot(data[i==1],aes(x=t,y=profit)) + geom_line()
+ggplot(data[i==5],aes(x=t,y=profit)) + geom_line()
 
 ```
 

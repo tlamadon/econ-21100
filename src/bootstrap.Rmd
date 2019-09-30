@@ -19,7 +19,7 @@ library(glmnet)
 lambda = 0.01
 n  = 10
 
-rr = data.table(foreach (i = 1:500,.combine=rbind) %do% {
+rr = data.table(foreach (i = 1:1000,.combine=rbind) %do% {
   D = rexp(n,lambda)
   res = data.frame(value=1/mean(D),value0=lambda)
   res$rep = i
@@ -31,19 +31,19 @@ ggplot(rr,aes(x=value)) +  geom_density(fill="blue",alpha=0.2,color="blue") + ge
 
 ```
 
-# compare bootstrap distribution to asymptotic one
+# Compare bootstrap distribution to asymptotic one
 
 We know that the asymptotic variance is $\lambda^2$ so we can compare the asymptotic distribution approximation to bootstrap distribution.
 
 ```{r}
-D = rexp(n,lambda)
+D0 = rexp(n,lambda)
 boostest <- function(D) {
   # we drawn from D with replacement
   D2 = sample(D,size = n,replace = TRUE)
   return(1/mean(D2))
 }
 
-rr = data.table(foreach (i = 1:500,.combine=rbind) %do% {
+rr = data.table(foreach (i = 1:1000,.combine=rbind) %do% {
   D = rexp(n,lambda)
   res = data.frame(value=1/mean(D),value0=lambda)
   res$rep = i
@@ -51,7 +51,7 @@ rr = data.table(foreach (i = 1:500,.combine=rbind) %do% {
   res
 })
 
-rr[,valueb := boostest(D),rep]
+rr[,valueb := boostest(D0),rep]
 rr[,valuea := lambda + 1/sqrt(n) * lambda * rnorm(.N)]
 
 ggplot(rr,aes(x=(value-lambda)/lambda)) + geom_density(fill="blue",alpha=0.2,color="blue") +
@@ -73,19 +73,17 @@ ggplot(rr,aes(x=(value))) + geom_density(fill="blue",alpha=0.2,color="blue") +
 # bootstrapping each time
 
 ```{r}
-
-
 boostest <- function(D) {
   # we drawn from D with replacement
   D2 = sample(D,size = n,replace = TRUE)
   return(1/mean(D2))
 }
 
-rr = data.table(foreach (i = 1:500,.combine=rbind) %do% {
+rr = data.table(foreach (i = 1:5000,.combine=rbind) %do% {
   D = rexp(n,lambda)
-  valueb = rep(0,100)
+  valueb = rep(0,200)
   # compute bootstrap estimates
-  for (j in 1:100) {
+  for (j in 1:200) {
     valueb[j] = boostest(D)
   }
   
@@ -95,7 +93,10 @@ rr = data.table(foreach (i = 1:500,.combine=rbind) %do% {
   res
 })
 
-ggplot(rr,aes(x=value)) + geom_density(fill="blue",alpha=0.2,color="blue") + geom_density(aes(x=valueb),fill="green",alpha=0.2,color="green") +
+rr[,valuea := lambda + 1/sqrt(n) * lambda * rnorm(.N)]
+
+ggplot(rr,aes(x=value)) + geom_density(fill="blue",alpha=0.2,color="blue") + geom_density(aes(x=valuea),fill="red",alpha=0.2,color="red") +
+geom_density(aes(x=valueb),fill="green",alpha=0.2,color="green") +
  geom_vline(xintercept=lambda,linetype=2,color="red") + geom_vline(xintercept=rr[,mean(value)],linetype=2,color="blue")+
 geom_vline(xintercept=rr[,mean(valueb)],linetype=2,color="green")+
 geom_vline(xintercept=rr[,2*mean(value) - mean(valueb)],linetype=1,color="orange")+theme_bw()
@@ -105,3 +106,14 @@ geom_vline(xintercept=rr[,2*mean(value) - mean(valueb)],linetype=1,color="orange
 ```
 
 # Extract and compare standard errors 
+
+```{r}
+# check a simple test that lambda is not zero
+
+rr[,mean( abs(value-value0)<1.96*valuesd )]
+rr[,mean( abs(valuea-value0)<1.96*valuesd )]
+
+
+
+```
+

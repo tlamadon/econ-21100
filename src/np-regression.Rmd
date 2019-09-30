@@ -64,7 +64,7 @@ ggplot(data,aes(x=x,y=kern_val2)) + geom_line() + geom_point(aes(y=y,alpha=kern_
 
 g <- function(x0,h) data[, sum( y * dnorm( (x-x0)/h))/sum( dnorm( (x-x0)/h)) ]
 
-data = data[, y_hat_kern := g(x,0.001),x]
+data = data[, y_hat_kern := g(x,0.1),x]
 ggplot(data,aes(x=x,y=y)) + geom_point() + geom_line(aes(y=yt),color="red",size=2) +geom_line(aes(y=y_hat_kern),color="green",size=1) + 
    theme_bw()
 

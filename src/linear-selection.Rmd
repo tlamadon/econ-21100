@@ -189,7 +189,7 @@ for (l in grid) {
   ridge.pred=predict(ridge.mod,s=l,newx=x[test,])
   v1=mean((ridge.pred-y.test)^2)
   y.train=predict(ridge.mod,s=l,newx=x[train,])
-  v2=mean((mean(y[train])-y.train)^2)
+  v2=mean((y[train]-y.train)^2)
   dd = rbind(dd,data.frame(i=i,l=l,test=v1,train=v2,cmse=cmse))
 }
 
