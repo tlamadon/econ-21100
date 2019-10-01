@@ -17,7 +17,7 @@ if (file.exists("../../src/hw-hetero-sol.R")) source("../../src/hw-hetero-sol.R"
 if (file.exists("../src/hw-hetero-sol.R")) source("../src/hw-hetero-sol.R")
 ```
 
-In this this homework, we are going to consider a simple model of unobserved heterogeneity. We will do this through the lense of unemployment duration.
+In this homework, we are going to consider a simple model of unobserved heterogeneity. We will do this through the lense of unemployment duration.
 
 # A simple model
 
@@ -27,7 +27,7 @@ The value of finding a job is given by $V_e = \frac{\rho W}{r}$. Where $\rho$ ca
 
 $$
 \begin{align}
-V_u & = \max_\lambda b_i - c(\lambda)  + \lambda_i \frac{\rho W}{(1+r) r} + \frac{1-\lambda_i}{1+r} V_u
+V_u & = \max_\lambda b - c(\lambda)  + \lambda \frac{\rho W}{(1+r) r} + \frac{1-\lambda}{1+r} V_u
 \end{align}
 $$
 <span class="label label-success">Question 1</span> show that for a fixed  $\lambda$ we can write:
@@ -51,7 +51,9 @@ data = data.table(B = 0, W = exp(rnorm(p$n) -3))
 
 # solve for lambda
 data[, Lb := ((p$rho*W - B)/(p$a))^(1/(1+p$gamma))]
-data[, Lb := pmin(Lb,pmax(Lb,0),1)]
+data[, Lb := pmin(pmax(Lb,0),1)]
+
+data[, D  := rexp(p$n, rate = Lb)]
 
 ggplot(data,aes(x=W,y=Lb)) + geom_line() + theme_bw()
 ```
@@ -88,8 +90,9 @@ data[, k := sample.int(3,.N,prob = p$pk,replace=T)]
 
 # solve for lambda
 data[, Lb := ((p$rho*W - B)/(p$a[k]))^(1/(1+p$gamma))]
-data[, Lb := pmin(Lb,pmax(Lb,0),1)] # bound it between 0 and 1
+data[, Lb := pmin(pmax(Lb,0),1)] # bound it between 0 and 1
 
+data[, D := rexp(p$n, rate = Lb)]
 ```
 
 <span class="label label-success">Question 5</span> write down a function that computes the liklihood of the data given our random effect model. Show that this likelihood picks close to the true value of $\gamma,a_1,a_2,a_3,p_1,p_2,p_3$ by varying each parameter separatly and reporting the likelihood (the $p$ parameters need to sum to 1).
@@ -116,8 +119,42 @@ We can try to maximize the overall likelihood using FE parameters $a_i$ by apply
  2. evaluate the likelihood at the value of $\gamma$
  3. do this for a grid of $\gamma$ and report what seems to be the highest value.
  
-<span class="label label-success">Question 6</span> Implement this in a function, report the estimate of $\gamma$ that it returns (please actually report a curve over $\gamma$).
+<span class="label label-success">Question 8</span> Implement this in a function, report the estimate of $\gamma$ that it returns (please actually report a curve over $\gamma$). Use the following code to generate data. Comment on the result.
 
+```{r}
+p = list(rho=0.9, gamma =1.5)
 
+p$n = 1000
+data = data.table(B = 0, W = exp(rnorm(p$n) -2))
 
+# draw the latent type
+data[, a := runif(p$n, min=0.5, max=2.5)]
+
+# solve for lambda
+data[, Lb := ((p$rho*W - B)/a)^(1/(1+p$gamma))]
+data[, Lb := pmin(pmax(Lb,0),1)] # bound it between 0 and 1
+
+data[, D := rexp(p$n, rate = Lb)]
+```
+
+<span class="label label-success">Question 9 (bonus) </span> Repeat the fixed-effect approach for the case that we observe two sets of wage and unemployment duration. Specifically, we generate the data by the following code.
+
+```{r}
+p = list(rho=0.9, gamma =1.5)
+
+p$n = 1000
+data = data.table(B = 0, W1 = exp(rnorm(p$n) -2), W2 = exp(rnorm(p$n) -2))
+
+# draw the latent type
+data[, a := runif(p$n, min=0.5, max=2.5)]
+
+# solve for lambda
+data[, Lb1 := ((p$rho*W1 - B)/a)^(1/(1+p$gamma))]
+data[, Lb2 := ((p$rho*W2 - B)/a)^(1/(1+p$gamma))]
+data[, Lb1 := pmin(pmax(Lb1,0),1)] # bound it between 0 and 1
+data[, Lb2 := pmin(pmax(Lb2,0),1)] # bound it between 0 and 1
+
+data[, D1 := rexp(p$n, rate = Lb1)]
+data[, D2 := rexp(p$n, rate = Lb2)]
+```
 
