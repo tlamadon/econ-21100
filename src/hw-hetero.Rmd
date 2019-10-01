@@ -12,7 +12,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-```{r,echo=FALSE,results=FALSE}
+```{r hw-hetero,echo=FALSE,results=FALSE}
 if (file.exists("../../src/hw-hetero-sol.R")) source("../../src/hw-hetero-sol.R")
 if (file.exists("../src/hw-hetero-sol.R")) source("../src/hw-hetero-sol.R")
 ```

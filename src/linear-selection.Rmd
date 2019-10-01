@@ -20,7 +20,7 @@ We try to minimize
 
 $$ \sum_{i=1}^n \Big( Y_i - X_i \beta   \Big)^2 + \lambda \sum_p \beta_p^2 $$
 
-```{r,echo=FALSE,message=FALSE,warning=FALSE}
+```{r manyregressors,echo=FALSE,message=FALSE,warning=FALSE}
 require(ggplot2)
 require(data.table)
 require(reshape2)

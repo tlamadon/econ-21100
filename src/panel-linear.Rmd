@@ -6,7 +6,7 @@ output:
 
 Lab for linaar panel data.
 
-```{r}
+```{r Linear Panel}
 require(ggplot2)
 require(data.table)
 require(reshape2)

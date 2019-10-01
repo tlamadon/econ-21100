@@ -171,7 +171,7 @@ C = acast(data,individual ~ mode,value.var="choice")
 C = C[,c(4,1,2,3)]
 p1=0.5
 
-I = sample(unique(data$individua),nrow(data)/8)
+I = sample( unique(data$individual),nrow(data)/8)
 I  =data$individual %in% I
 
 # we start with the very first mlogit (we randomly sub-sample to create some variation)
@@ -215,14 +215,14 @@ plot(liks)
 ```{r}
 require(RcppSimpleTensor)
 data("Train", package = "mlogit")
-data = Train
-fit = glm(choice=="choice1" ~ 0 + I(log(price1/price2)) + I(log(time1/time2)),data,family = binomial('probit'))
+data = data.table(Train)
+fit = glm(choice=="choice1" ~ 0 + I(log(price_A/price_B)) + I(log(time_A/time_B)),data,family = binomial('probit'))
 N = nrow(data)
 
-ggplot(data,aes(x=log(price1/price2),y=log(time1/time2),color=choice)) + geom_point() + theme_bw()
+ggplot(data,aes(x=log(price_A/price_B),y=log(time_A/time_B),color=choice)) + geom_point() + theme_bw()
 
 # let's put this in matrices
-X = cbind( log(data$price1/data$price2), log(data$time1/data$time2))
+X = cbind( log(data$price_A/data$price_B), log(data$time_A/data$time_B))
 colnames(X) = c("price","time")
 Y = (data$choice == "choice1")*1
 

@@ -75,7 +75,7 @@ $$ V(x) = \log\Big( \exp \Big[p(x) + \lambda(x)\beta V(x+u)\Big] + \exp \Big[ -C
 There is not hope to solve this problem in closed form. We tackle it numerically.
 
 
-```{r}
+```{r dyndiscretechoice}
 n      = 100
 V      = rep(0,n)
 x      = seq(0,100,l=n)

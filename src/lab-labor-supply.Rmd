@@ -9,7 +9,7 @@ output:
       smooth_scroll: false
 ---
 
-```{r setup, include=FALSE}
+```{r laborsupply, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 require(testthat)
 require(xtable)

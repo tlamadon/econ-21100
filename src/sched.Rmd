@@ -14,10 +14,10 @@ You can download the notes for the class:
     - Study theats to identification  (endogeneity, measurement error, simultaneity)
     - Finite sample gaussian inference
     - Asymptotic inference (central limit theorem)
+    - [Lab <i class="fa fa-external-link" aria-hidden="true"></i>](lab-labor-supply.html) on labor supply 
     - Heckman (77)  [paper <i class="fa fa-external-link" aria-hidden="true"></i>](http://www.nber.org/papers/w0172)
     - Saez (99) [paper <i class="fa fa-external-link" aria-hidden="true"></i>](https://eml.berkeley.edu/~saez/saezAEJ10bunching.pdf) and [slides <i class="fa fa-download" aria-hidden="true"></i> ](pdf/slides-laborsupply-kink-ug.pdf)
     - Blundell, Duncan and Meghir (98) [paper <i class="fa fa-external-link" aria-hidden="true"></i>](https://www.jstor.org/stable/2999575) and [slides <i class="fa fa-download" aria-hidden="true"></i> ](pdf/slides-laborsupply-bdm-ug.pdf)
-    - [Lab <i class="fa fa-external-link" aria-hidden="true"></i>](lab-labor-supply.html) on labor supply 
   - Topics on inference
     - Bootstrap
     - Clustering of standard errors, Cameron and Miller guide [paper <i class="fa fa-external-link" aria-hidden="true"></i>](http://cameron.econ.ucdavis.edu/research/Cameron_Miller_JHR_2015_February.pdf)
@@ -27,28 +27,31 @@ You can download the notes for the class:
     - Estimation of multinomial logit
     - McFadden (74) [paper <i class="fa fa-external-link" aria-hidden="true"></i>](https://www.sciencedirect.com/science/article/pii/0047272774900036)
     - Maximum score estimation, Manski (75) [paper <i class="fa fa-external-link" aria-hidden="true"></i>](https://www.sciencedirect.com/science/article/pii/0304407675900329)
-    - Marriage market with Choo and Siow (03) [paper <i class="fa fa-external-link" aria-hidden="true"></i>](http://homes.chass.utoronto.ca/~siow/papers/who_marries_whom.pdf)
     - [Lab <i class="fa fa-external-link" aria-hidden="true"></i>](lab-labor-supply.html) on discrete choice 
-  - Unobserved heterogeneity
-    - Revisit multinomial problem and IIA 
-    - Random effect model and EM-algorithm
+    - Marriage market with Choo and Siow (03) [paper <i class="fa fa-external-link" aria-hidden="true"></i>](http://homes.chass.utoronto.ca/~siow/papers/who_marries_whom.pdf)
   - Dynamic programing 
     - Introducing Bellman equations (through cake eating problem)
     - Study the estimation of dynamic programing 
-    - Rust (74) [paper <i class="fa fa-external-link" aria-hidden="true"></i>](http://people.hss.caltech.edu/~mshum/stats/rust.pdf)
+    - Rust (74) [paper <i class="fa fa-external-link"     
+  - Unobserved heterogeneity
+    - Revisit multinomial problem and IIA 
+    - Random effect model and EM-algorithm
+aria-hidden="true"></i>](http://people.hss.caltech.edu/~mshum/stats/rust.pdf)
     - [Lab <i class="fa fa-external-link" aria-hidden="true"></i>](lab-labor-supply.html) on dynamic discrete choice 
   - Topics in non-parametrics and high-dimensional econometrics
     - model complexity and bias/variance trade-off
     - many regressors (application to network of peers)
     - non parametric regression
-  - Linear model with panel data, parallel worlds 
-    - Possibility of using repeated measurements to alleviate/test threats mentioned before
+  - Measuring sorting in the labor market
+    - incidental parameter problems
+    - Fixed-effect approach, bias correction
+    - Group fixed effect approach
 
 ## Homeworks
 
-You can submit your homework either as solo or as a group of two. To communicate about your homework, create a channel in our slack group with a name starting with `grp_` and then with the initials of the members of your group. For instance the TA (Wooyong) and myself (Thibaut) would be `grp_tw`. Then please add the RA and myself as members of that group. You can make your group private if you don't want other students to see your homework. Submit the analytical parts directly to this slack group.
+You can submit your homework either as solo or as a group of two. To communicate about your homework, create a channel in our slack group with a name starting with `grp_` and then with the initials of the members of your group. For instance the TA (Arjun) and myself (Thibaut) would be `grp_at`. Then please add Arjun and myself as members of that group. You can make your group private if you don't want other students to see your homework. Submit the analytical parts directly to this slack group.
 
-To submit your answers to computational homeworks. Please create a `git` repository (you can make it private), and add the RA and myself as contributor (in the case of private), or just share the URL with us if you choose to make the repo public. You can create your repository on [github](http://github.com) or [bitbucket](htpp://bitbucket.org), your choice!
+<!-- To submit your answers to computational homeworks. Please create a `git` repository (you can make it private), and add the RA and myself as contributor (in the case of private), or just share the URL with us if you choose to make the repo public. You can create your repository on [github](http://github.com) or [bitbucket](htpp://bitbucket.org), your choice! -->
 
  - [Homework 1](pdf/hw1_w18.pdf) (analytical) is due Monday, January the 22nd, Midnight. 
  - [Homework 2](hw-lsupply.html) (computer) is due Wednesday, January the 31nd, Midnight.
@@ -58,8 +61,8 @@ To submit your answers to computational homeworks. Please create a `git` reposit
  
 ## End of class project
 
- - The project can be done in group of two. The goal is for you to take an economic or policy question and to develop a DGP for that question as well as a method adpated to ansering that question given the data. Through the project you should show the potential ptifalls of given methods.
- - 1 page proposal is due end of week 7.
+ - The project can be done in group of three. The goal is for you to take an economic or policy question and to develop a DGP for that question as well as a method adpated to answering that question given data. The project should show the potential pitfalls of given methods.
+ - 1 page proposal is due end of week 7, this should include the DGP.
 
 ## Midterm
 

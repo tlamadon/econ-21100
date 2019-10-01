@@ -1,8 +1,8 @@
 
 <br/><br/>
-This contains help files for the class _Econ 21130_ at University of Chicago. The corresponding github repository can be found [here](https://github.com/tlamadon/econ-21100), it is shared with my previous class. The class is taught by [T. Lamadon](http://www.lamadon.com). If you are a student, please sign up on the slack group. 
+This contains help files for the class _Econ 21130_ at University of Chicago taught in the Fall of 2019. The corresponding github repository can be found [here](https://github.com/tlamadon/econ-21100), it is shared with my previous class. The class is taught by me, [T. Lamadon](http://www.lamadon.com). If you are a student, please sign up on the slack group. 
 
-<a class="btn btn-danger" href="https://econ21130-w18.slack.com/signup" role="button">Slack group</a>
+<a class="btn btn-danger" href="https://econ21130-f19.slack.com/signup" role="button">Slack group</a>
 
 <!-- Place this tag where you want the button to render. -->
 <a class="github-button" href="https://github.com/tlamadon/econ-21100/archive/master.zip" data-icon="octicon-cloud-download" data-style="mega" aria-label="Download tlamadon/econ-21100 on GitHub">Download</a>  <a class="github-button" href="https://github.com/tlamadon/econ-21100/fork" data-icon="octicon-repo-forked" data-style="mega" data-count-href="/tlamadon/econ-21100/network" data-count-api="/repos/tlamadon/econ-21100#forks_count" data-count-aria-label="# forks on GitHub" aria-label="Fork tlamadon/econ-21100 on GitHub">Fork</a>

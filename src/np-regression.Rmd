@@ -6,7 +6,7 @@ output:
 
 Intro to non-parametric regressions.
 
-```{r}
+```{r npregression}
 require(ggplot2)
 require(data.table)
 require(reshape2)

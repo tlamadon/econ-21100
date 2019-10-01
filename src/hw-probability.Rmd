@@ -17,8 +17,8 @@ In this homework we are going to revisit some concept that we covered in class.
 
 Get the prepared data constructed from the PSID from [Blundell, Pistaferri and Saporta](http://www.tau.ac.il/~itaysap/AER_BPS_data.zip). To load this data you will need to install the package `readstata13`. You can do that by running:
 
-```r
-install.packages('readstata13')
+```{r hw-proba}
+#install.packages('readstata13')
 ```
 
 then you can load the data

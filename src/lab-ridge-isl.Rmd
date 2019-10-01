@@ -8,7 +8,7 @@ Borrowed from the book ISLR.
 
 # Chapter 6 Lab 2: Ridge Regression and the Lasso
 
-```{r}
+```{r ridge}
 library(ISLR)
 Hitters = Hitters[!is.na(Hitters$Salary),]
 

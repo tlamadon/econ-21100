@@ -19,7 +19,7 @@ output:
 ## Computer Question 
 
 
-```{r,message=FALSE,warning=FALSE}
+```{r hw-inference,message=FALSE,warning=FALSE}
 require(kableExtra)
 require(ggplot2)
 require(texreg)
