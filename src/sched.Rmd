@@ -18,8 +18,6 @@ You can download the notes for the class:
     - Heckman (77)  [paper <i class="fa fa-external-link" aria-hidden="true"></i>](http://www.nber.org/papers/w0172)
     - Saez (99) [paper <i class="fa fa-external-link" aria-hidden="true"></i>](https://eml.berkeley.edu/~saez/saezAEJ10bunching.pdf) and [slides <i class="fa fa-download" aria-hidden="true"></i> ](pdf/slides-laborsupply-kink-ug.pdf)
     - Blundell, Duncan and Meghir (98) [paper <i class="fa fa-external-link" aria-hidden="true"></i>](https://www.jstor.org/stable/2999575) and [slides <i class="fa fa-download" aria-hidden="true"></i> ](pdf/slides-laborsupply-bdm-ug.pdf)
-  - Topics on inference
-    - Bootstrap
     - Clustering of standard errors, Cameron and Miller guide [paper <i class="fa fa-external-link" aria-hidden="true"></i>](http://cameron.econ.ucdavis.edu/research/Cameron_Miller_JHR_2015_February.pdf)
     - Thinking about multiple testing
   - Multinomial decisions (we will use transportation and monopolistic competition)
@@ -29,15 +27,10 @@ You can download the notes for the class:
     - Maximum score estimation, Manski (75) [paper <i class="fa fa-external-link" aria-hidden="true"></i>](https://www.sciencedirect.com/science/article/pii/0304407675900329)
     - [Lab <i class="fa fa-external-link" aria-hidden="true"></i>](lab-labor-supply.html) on discrete choice 
     - Marriage market with Choo and Siow (03) [paper <i class="fa fa-external-link" aria-hidden="true"></i>](http://homes.chass.utoronto.ca/~siow/papers/who_marries_whom.pdf)
-  - Dynamic programing 
-    - Introducing Bellman equations (through cake eating problem)
-    - Study the estimation of dynamic programing 
-    - Rust (74) [paper <i class="fa fa-external-link"     
+    - Boostrap
   - Unobserved heterogeneity
     - Revisit multinomial problem and IIA 
     - Random effect model and EM-algorithm
-aria-hidden="true"></i>](http://people.hss.caltech.edu/~mshum/stats/rust.pdf)
-    - [Lab <i class="fa fa-external-link" aria-hidden="true"></i>](lab-labor-supply.html) on dynamic discrete choice 
   - Topics in non-parametrics and high-dimensional econometrics
     - model complexity and bias/variance trade-off
     - many regressors (application to network of peers)
@@ -46,6 +39,11 @@ aria-hidden="true"></i>](http://people.hss.caltech.edu/~mshum/stats/rust.pdf)
     - incidental parameter problems
     - Fixed-effect approach, bias correction
     - Group fixed effect approach
+  - Dynamic programing 
+    - Introducing Bellman equations (through cake eating problem)
+    - Study the estimation of dynamic programing 
+    - [Lab <i class="fa fa-external-link" aria-hidden="true"></i>](lab-labor-supply.html) on dynamic discrete choice 
+    - Rust (74) [paper <i class="fa fa-external-link" aria-hidden="true"></i>](http://people.hss.caltech.edu/~mshum/stats/rust.pdf)
 
 ## Homeworks
 
@@ -53,21 +51,25 @@ You can submit your homework either as solo or as a group of two. To communicate
 
 <!-- To submit your answers to computational homeworks. Please create a `git` repository (you can make it private), and add the RA and myself as contributor (in the case of private), or just share the URL with us if you choose to make the repo public. You can create your repository on [github](http://github.com) or [bitbucket](htpp://bitbucket.org), your choice! -->
 
- - [Homework 1](pdf/hw1_w18.pdf) (analytical) is due Monday, January the 22nd, Midnight. 
- - [Homework 2](hw-lsupply.html) (computer) is due Wednesday, January the 31nd, Midnight.
- - [Homework 3](hw-inference.html) (computer) is due Wednesday, February 7th, Midnight.
- - [Homework 4](pdf/hw4_w18.pdf) (analytical) is due Thursday, Ferbruary 16th. 
- - [Homework 5](hw-hetero.html) (computer) is due Friday, March 9th, Midnight.
+ - [Homework 1](pdf/hw1_w18.pdf) (analytical) due date TBD. 
+ - [Homework 2](hw-lsupply.html) (computer) due date TBD. 
+ - [Homework 3](hw-inference.html) (computer) due date TBD. 
+ - [Homework 4](pdf/hw4_w18.pdf) (analytical) due date TBD. 
+ - [Homework 5](hw-hetero.html) (computer) due date TBD. 
  
 ## End of class project
 
- - The project can be done in group of three. The goal is for you to take an economic or policy question and to develop a DGP for that question as well as a method adpated to answering that question given data. The project should show the potential pitfalls of given methods.
- - 1 page proposal is due end of week 7, this should include the DGP.
+ - The project can be done in group of three. The goal is for you to take an economic or policy question and to develop a DGP for that question as well as a method adpated to answering that question given data. The project should highlight the potential pitfalls of given methods. 
+ - 1 page proposal is due on week 8, Thrudsay nov 21st. This should include a question and a DGP.
+ - finall submission of the project will be after finals.
 
 ## Midterm
 
- - The <span class="label label-warning">midterm</span> will in week 8, on Thursday February 22nd.
- - I will be away during week 8.
+ - The <span class="label label-warning">midterm</span> will in week 7, on Thursday November 14th.
+ - I will be away during week 4 (Oct 22nd and 24th).
 
+## Grading scheme
+
+Overall grade will be 1/3 homeworks, 1/3 midterm, 1/3 project.
 
 
