@@ -23,3 +23,8 @@ spread <- function (A, loc, dims) {
   }
   return(aperm(array(A, dim = sdim), edim))
 }
+
+
+first_time <- function() {
+  install.packages('glmnet')
+}
