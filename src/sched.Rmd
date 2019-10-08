@@ -9,14 +9,14 @@ You can download the notes for the class:
  
 ## Class schedule
 
-  - Linear models for cross-section (running example will be labor supply)
-    - Clarify concepts such as data, model, identification, estimation and inference
+  - Linear models for cross-section (running example will be labor supply) 
+    - Clarify concepts such as data, model, identification, estimation and inference <i class="fas fa-check"></i>
     - Study theats to identification  (endogeneity, measurement error, simultaneity)
-    - Finite sample gaussian inference
-    - Asymptotic inference (central limit theorem)
+    - Finite sample gaussian inference <i class="fas fa-check"></i>
+    - Asymptotic inference (central limit theorem) <i class="fas fa-check"></i>
     - [Lab <i class="fa fa-external-link" aria-hidden="true"></i>](lab-labor-supply.html) on labor supply 
     - Heckman (77)  [paper <i class="fa fa-external-link" aria-hidden="true"></i>](http://www.nber.org/papers/w0172)
-    - Saez (99) [paper <i class="fa fa-external-link" aria-hidden="true"></i>](https://eml.berkeley.edu/~saez/saezAEJ10bunching.pdf) and [slides <i class="fa fa-download" aria-hidden="true"></i> ](pdf/slides-laborsupply-kink-ug.pdf)
+    - Saez (99) [paper <i class="fa fa-external-link" aria-hidden="true"></i>](https://eml.berkeley.edu/~saez/saezAEJ10bunching.pdf) and [slides <i class="fa fa-download" aria-hidden="true"></i> ](pdf/slides-laborsupply-kink-ug.pdf) <i class="fas fa-check"></i>
     - Blundell, Duncan and Meghir (98) [paper <i class="fa fa-external-link" aria-hidden="true"></i>](https://www.jstor.org/stable/2999575) and [slides <i class="fa fa-download" aria-hidden="true"></i> ](pdf/slides-laborsupply-bdm-ug.pdf)
     - Clustering of standard errors, Cameron and Miller guide [paper <i class="fa fa-external-link" aria-hidden="true"></i>](http://cameron.econ.ucdavis.edu/research/Cameron_Miller_JHR_2015_February.pdf)
     - Thinking about multiple testing
@@ -51,7 +51,7 @@ You can submit your homework either as solo or as a group of two. To communicate
 
 <!-- To submit your answers to computational homeworks. Please create a `git` repository (you can make it private), and add the RA and myself as contributor (in the case of private), or just share the URL with us if you choose to make the repo public. You can create your repository on [github](http://github.com) or [bitbucket](htpp://bitbucket.org), your choice! -->
 
- - [Homework 1](pdf/hw1_w18.pdf) (analytical) due date TBD. 
+ - <span class="label label-warning">new</span> [Homework 1](pdf/hw1_f19.pdf) (analytical) due date is Tuesday Oct 15th . 
  - [Homework 2](hw-lsupply.html) (computer) due date TBD. 
  - [Homework 3](hw-inference.html) (computer) due date TBD. 
  - [Homework 4](pdf/hw4_w18.pdf) (analytical) due date TBD. 
@@ -59,7 +59,7 @@ You can submit your homework either as solo or as a group of two. To communicate
  
 ## End of class project
 
- - The project can be done in group of three. The goal is for you to take an economic or policy question and to develop a DGP for that question as well as a method adpated to answering that question given data. The project should highlight the potential pitfalls of given methods. 
+ - The project can be done in groups of three. The goal is for you to take an economic or policy question and to develop a DGP for that question as well as a method adpated to answering that question given data. The project should highlight the potential pitfalls of given methods. 
  - 1 page proposal is due on week 8, Thrudsay nov 21st. This should include a question and a DGP.
  - finall submission of the project will be after finals.
 
