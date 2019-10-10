@@ -125,6 +125,35 @@ simdata[, u0 := lw - p$gamma * log(h) + p$eta * log(c) - p$beta * X ]
 simdata[, mean(u0)]
 simdata[, mean(u0 * lw)]
 simdata[, mean(u0 * X)]
+
+ff <- function(par) {
+  simdata[, u0 := lw - par[1] * log(h) + par[2] * log(c) - par[3] * X ]
+  m1 = simdata[, mean(u0 * mu)]
+  m2 = simdata[, mean(u0 * lw)]
+  m3 = simdata[, mean(u0 * X)]
+  return(m1^2 + m2^2 + m3^2)
+}
+
+ff(c(p$gamma,p$eta,p$beta))
+
+val = rep(0,100)
+sup = seq(-0.2,0.2,l=100)
+for (i in 1:100) {
+  val[i] = ff(c(p$gamma + sup[i] ,p$eta,p$beta))
+}
+plot(sup,val)
+for (i in 1:100) {
+  val[i] = ff(c(p$gamma ,p$eta + sup[i],p$beta))
+}
+plot(sup,val)
+for (i in 1:100) {
+  val[i] = ff(c(p$gamma ,p$eta,p$beta + sup[i]))
+}
+plot(sup,val)
+
+res = optim(c(p$gamma,p$eta,p$beta),ff)
+res = optim(c(p$gamma + runif(1),p$eta + runif(1),p$beta + runif(1)),ff,control = list(abstol=1e-8))
+
 ```
 
 
