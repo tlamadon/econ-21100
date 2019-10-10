@@ -106,6 +106,8 @@ expect_equivalent(coef(sfit)["log(h)",1],p$gamma)
 
 sfit2 = summary(simdata[,lm(lw ~ log(c) + log(h))])
 expect_false(coef(sfit2)["log(c)",1]==-p$eta)
+
+sfit3 = summary(simdata[,lm(lw ~ log(c) + log(h) + X)])
 ```
 
 ```{r, ,results='asis'}
