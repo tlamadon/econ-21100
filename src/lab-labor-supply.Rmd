@@ -52,9 +52,9 @@ ff.newt <- function(x,w,R,eta,gamma,beta) {
 We are going to simulate a data set where agents will choose participation as well as the number of hours if they decide to work. To do that we will solve for the interior solution under a given tax rate and compare this to the option of no-work.
 
 ```{r, results='hide'}
-p  = list(eta=-1.5,gamma = 0.8,beta=1) # define preferences
+p  = list(eta=-1.5,gamma = 0.8,beta=1,nu=0.5) # define preferences
 tx = list(rho=1,r=0) # define a simple tax
-N=1000
+N=50000
 simdata = data.table(i=1:N,X=rnorm(N))
 simdata <- simdata[,lw := X     + rnorm(N)*0.2];      # add a wage which depends on X
 simdata <- simdata[,mu := exp(0.3*X + rnorm(N)*0.2)]; # add non-labor income that also depends on X
@@ -89,7 +89,7 @@ pander(summary(simdata[,lm(lw ~ log(c) + log(h))]))
 Finally we want to add heterogeneity in the $\beta$ parameter. 
 
 ```{r, results="hide"}
-simdata <- simdata[,betai := exp(0.5*X+rnorm(N)*0.1)]
+simdata <- simdata[,betai := exp(p$beta*X+rnorm(N)*0.1)]
 simdata <- simdata[, h := pmax(-mu+tx$r ,0)/exp(lw)+1]
 for (i in 1:30) {
   simdata <- simdata[, h := ff.newt(h,tx$rho*exp(lw),mu-tx$r,p$eta,p$gamma,betai) ]
@@ -111,6 +111,20 @@ expect_false(coef(sfit2)["log(c)",1]==-p$eta)
 ```{r, ,results='asis'}
 pander(sfit2)
 ```
+
+Next we check the non linear moment condition 
+
+$$ E \left[ \log(w) - \gamma \log h - \eta \log c + \nu x   | W,R,X \right] $$
+
+```{r, ,results='asis'}
+
+simdata[, u0 := lw - p$gamma * log(h) + p$eta * log(c) - p$beta * X ]
+
+simdata[, mean(u0)]
+simdata[, mean(u0 * lw)]
+simdata[, mean(u0 * X)]
+```
+
 
 ## Simple case of $\eta=0$
 

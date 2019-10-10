@@ -26,5 +26,5 @@ spread <- function (A, loc, dims) {
 
 
 first_time <- function() {
-  install.packages('glmnet')
+  install.packages(c('glmnet','pander'))
 }
