@@ -1,5 +1,6 @@
 push:
-	rsync --checksum --update --progress -a docs/* zadigh@www.lamadon.com:/home/zadigh/econ21130.lamadon.com
+	rsync -e ssh --checksum --update --progress -a docs/* zadigh@lamadon.com:/home/zadigh/econ21130.lamadon.com
+	rsync -e ssh --checksum --update --progress -a pdf/* zadigh@lamadon.com:/home/zadigh/econ21130.lamadon.com/pdf
 
 PAGES = \
 	docs/bootstrap.html \

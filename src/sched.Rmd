@@ -14,8 +14,8 @@ You can download the notes for the class:
     - Study theats to identification  (endogeneity, measurement error, simultaneity)
     - Finite sample gaussian inference <i class="fas fa-check"></i>
     - Asymptotic inference (central limit theorem) <i class="fas fa-check"></i>
-    - [Lab <i class="fa fa-external-link" aria-hidden="true"></i>](lab-labor-supply.html) on labor supply 
-    - Heckman (77)  [paper <i class="fa fa-external-link" aria-hidden="true"></i>](http://www.nber.org/papers/w0172)
+    - [Lab <i class="fa fa-external-link" aria-hidden="true"></i>](lab-labor-supply.html) on labor supply  <i class="fas fa-check"></i>
+    - Heckman (77)  [paper <i class="fa fa-external-link" aria-hidden="true"></i>](http://www.nber.org/papers/w0172) <i class="fas fa-check"></i>
     - Saez (99) [paper <i class="fa fa-external-link" aria-hidden="true"></i>](https://eml.berkeley.edu/~saez/saezAEJ10bunching.pdf) and [slides <i class="fa fa-download" aria-hidden="true"></i> ](pdf/slides-laborsupply-kink-ug.pdf) <i class="fas fa-check"></i>
     - Blundell, Duncan and Meghir (98) [paper <i class="fa fa-external-link" aria-hidden="true"></i>](https://www.jstor.org/stable/2999575) and [slides <i class="fa fa-download" aria-hidden="true"></i> ](pdf/slides-laborsupply-bdm-ug.pdf)
     - Clustering of standard errors, Cameron and Miller guide [paper <i class="fa fa-external-link" aria-hidden="true"></i>](http://cameron.econ.ucdavis.edu/research/Cameron_Miller_JHR_2015_February.pdf)
@@ -52,7 +52,7 @@ You can submit your homework either as solo or as a group of two. To communicate
 <!-- To submit your answers to computational homeworks. Please create a `git` repository (you can make it private), and add the RA and myself as contributor (in the case of private), or just share the URL with us if you choose to make the repo public. You can create your repository on [github](http://github.com) or [bitbucket](htpp://bitbucket.org), your choice! -->
 
  - <span class="label label-warning">new</span> [Homework 1](pdf/hw1_f19.pdf) (analytical) due date is Tuesday Oct 15th . 
- - [Homework 2](hw-lsupply.html) (computer) due date TBD. 
+ - [Homework 2](hw-lsupply.html) (computer) due on Sunday October 27th at midnight. 
  - [Homework 3](hw-inference.html) (computer) due date TBD. 
  - [Homework 4](pdf/hw4_w18.pdf) (analytical) due date TBD. 
  - [Homework 5](hw-hetero.html) (computer) due date TBD. 
@@ -72,4 +72,11 @@ You can submit your homework either as solo or as a group of two. To communicate
 
 Overall grade will be 1/3 homeworks, 1/3 midterm, 1/3 project.
 
+## Books
 
+These are some books that can be helpful to dig into more details of the topics covered in class. These books are __not required__ for the class.
+
+ - [Microeconometrics: Methods and Applications: A. Colin Cameron, Pravin K. Trivedi](https://www.amazon.com/Microeconometrics-Methods-Applications-Colin-Cameron/dp/0521848059)
+ - [Econometric Theory and Methods, Davidson and MacKinnon](https://www.amazon.com/Econometric-Theory-Methods-Russell-Davidson/dp/0195123727)
+ - [An Introduction to Statistical Learning: with Applications in R, Gareth James, Daniela Witten, Trevor Hastie, Robert Tibshirani](https://www.amazon.com/Introduction-Statistical-Learning-Applications-Statistics/dp/1461471370)
+ - [All of Statistics: A Concise Course in Statistical Inference, Larry Wasserman](https://www.amazon.com/All-Statistics-Statistical-Inference-Springer/dp/0387402721/ref=sr_1_1?keywords=all+of+statistics&qid=1571320533&s=books&sr=1-1)

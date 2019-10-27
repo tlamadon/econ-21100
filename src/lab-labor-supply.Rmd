@@ -24,7 +24,7 @@ $$
 \max_{c,h} \frac{c^{1+\eta}}{1+\eta} - \beta \frac{h^{1+\gamma}}{1+\gamma}\\
 \text{s.t. } c = \rho \cdot w\cdot h -r + \mu - \beta_0 \cdot 1[h>0] \\ 
 $$
-The individual takes his wage $w$ as given, he chooses hours of work $h$ and consumption $c$ subject to a given non labor income $\mu$ as well as a tax regime defined by $\rho,r$. $\beta_0$ is a fixed cost associated with working.
+The individual takes his wage $w$ as given, he chooses hours of work $h$ and consumption $c$ subject to a given non labor income $\mu$ as well as a tax regime defined by $\rho,r$. $\beta_0$ is a fixed cost associated with working. We ignore participation here, see the homework for including it.
 
 We note already that the non labor income can control for dynamic labor supply since we can have $\mu= b_t - (1+r)b_{t+1}$. This is part of a larger maximization problem where the agents choose optimaly $b_t$ over time. We will get there next time.
 
@@ -45,6 +45,7 @@ ff.newt <- function(x,w,R,eta,gamma,beta) {
   x  = ifelse(x<0, 0.0001,x)
   x
 }
+
 ```
 
 ## Simulating data
@@ -114,55 +115,12 @@ sfit3 = summary(simdata[,lm(lw ~ log(c) + log(h) + X)])
 pander(sfit2)
 ```
 
-Next we check the non linear moment condition 
-
-$$ E \left[ \log(w) - \gamma \log h - \eta \log c + \nu x   | W,R,X \right] $$
-
-```{r, ,results='asis'}
-
-simdata[, u0 := lw - p$gamma * log(h) + p$eta * log(c) - p$beta * X ]
-
-simdata[, mean(u0)]
-simdata[, mean(u0 * lw)]
-simdata[, mean(u0 * X)]
-
-ff <- function(par) {
-  simdata[, u0 := lw - par[1] * log(h) + par[2] * log(c) - par[3] * X ]
-  m1 = simdata[, mean(u0 * mu)]
-  m2 = simdata[, mean(u0 * lw)]
-  m3 = simdata[, mean(u0 * X)]
-  return(m1^2 + m2^2 + m3^2)
-}
-
-ff(c(p$gamma,p$eta,p$beta))
-
-val = rep(0,100)
-sup = seq(-0.2,0.2,l=100)
-for (i in 1:100) {
-  val[i] = ff(c(p$gamma + sup[i] ,p$eta,p$beta))
-}
-plot(sup,val)
-for (i in 1:100) {
-  val[i] = ff(c(p$gamma ,p$eta + sup[i],p$beta))
-}
-plot(sup,val)
-for (i in 1:100) {
-  val[i] = ff(c(p$gamma ,p$eta,p$beta + sup[i]))
-}
-plot(sup,val)
-
-res = optim(c(p$gamma,p$eta,p$beta),ff)
-res = optim(c(p$gamma + runif(1),p$eta + runif(1),p$beta + runif(1)),ff,control = list(abstol=1e-8))
-
-```
-
-
 ## Simple case of $\eta=0$
 
 ```{r}
 p  = list(eta=0,gamma = 0.8,beta=1,beta0=0) # define preferences
 tx = list(rho=1,r=0) # define a simple tax
-N=1000
+N=500
 simdata = data.table(i=1:N,X=rnorm(N))
 simdata <- simdata[,lw := X     + rnorm(N)*0.2];      # add a wage which depends on X
 simdata <- simdata[,mu := exp(0.3*X + rnorm(N)*0.2)]; # add non-labor income that also depends on X
@@ -189,4 +147,60 @@ simdata <- simdata[, h2 := (tx2$rho*exp(lw)/betai)^(1/p2$gamma)]
 simdata[, list(totearnings =mean(exp(lw+h)), R1=mean((1-tx$rho)*exp(lw+h)),R2=mean((1-tx2$rho)*exp(lw+h2)) ,R3=mean((1-tx2$rho)*exp(lw+h)) )]
 
 
+```
+
+## Heterogeneity in $\beta$ revisited
+
+Finally we want to add heterogeneity in the $\beta$ parameter. 
+
+```{r, results="hide"}
+p  = list(eta=-1.5,gamma = 0.8,beta=1,beta0=0) # define preferences
+tx = list(rho=1,r=0) # define a simple tax
+N=5000
+simdata = data.table(i=1:N,X=rnorm(N))
+simdata <- simdata[,lw := X     + rnorm(N)*0.2];      # add a wage which depends on X
+simdata <- simdata[,mu := exp(0.3*X + rnorm(N)*0.2)]; # add non-labor income that also depends on X
+simdata <- simdata[,eps := rnorm(N)*0.1]
+simdata <- simdata[,betai := exp(0.5*X+eps)]
+simdata <- simdata[, h := (tx$rho*exp(lw)/betai)^(1/p$gamma)]
+simdata <- simdata[, betai := exp(p$beta*X+rnorm(N)*0.1)]
+simdata <- simdata[, h := pmax(-mu+tx$r ,0)/exp(lw)+1]
+for (i in 1:30) {
+  simdata <- simdata[, h := ff.newt(h,tx$rho*exp(lw),mu-tx$r,p$eta,p$gamma,betai) ]
+}
+
+# attach consumption
+simdata <- simdata[, c  := exp(lw)*h + mu];
+
+# let's check that the FOC holds
+sfit = summary(simdata[,lm(lw ~ log(c) + log(h) + log(betai))])
+expect_equivalent(sfit$r.squared,1)
+expect_equivalent(coef(sfit)["log(c)",1],-p$eta)
+expect_equivalent(coef(sfit)["log(h)",1],p$gamma)
+
+sfit2 = summary(simdata[,lm(lw ~ log(c) + log(h))])
+expect_false(coef(sfit2)["log(c)",1]==-p$eta)
+
+sfit3 = summary(simdata[,lm(lw ~ log(c) + log(h) + X)])
+```
+
+```{r, ,results='asis'}
+pander(sfit2)
+```
+
+Next we have established the following condition in the class:
+
+$$ E \left[ \log(w) - \gamma \log h - \eta \log c + \nu x   | W,R,X \right] = 0 $$
+This suggests an IV strategy where we instrument using $W,R,X$. We then first regress $h$ and $c$ on these thre varaibles to get the predicted component, that we then use in a regression.
+
+```{r, ,results='asis'}
+
+fit_h = simdata[, lm( log(h) ~ lw + log(mu) + X ) ]
+fit_c = simdata[, lm( log(c) ~ lw + log(mu) + X ) ]
+simdata[, h_iv := predict(fit_h)]
+simdata[, c_iv := predict(fit_c)]
+
+sfit_iv = simdata[, lm( lw ~ h_iv + c_iv + X   )]
+
+pander(sfit_iv)
 ```

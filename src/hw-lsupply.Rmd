@@ -26,8 +26,6 @@ $$
 $$
 The individual takes his wage $w$ as given, he chooses hours of work $h$ and consumption $c$. He also chooses whether to work in the labor force or to work at home where he has an equivalent wage $r$.
 
-<span class="label label-success">Question 1</span> Do we expect to see any income effect given our model? What if we substituted $c$ in the utility for $\frac{c^{1+\eta}}{1+\eta}$?
-
 ## Simulating data
 
 We are going to simulate a data set where agents will choose participation as well as the number of hours if they decide to work. This requires for us to specify how each of the individual specific variables are drawn. We then set the following:
@@ -42,7 +40,7 @@ $$
 
 and finally $(X_i,Z_i,\epsilon_i,u_i,\xi_i)$ are independent normal draws. Given all of this we can simulate our data. 
 
-<span class="label label-success">Question 2</span> What does the $a$ parameter capture here?
+<span class="label label-success">Question 1</span> What does the $a$ parameter capture here?
 
 ```{r, results='hide'}
 p  = list(gamma = 0.8,beta=1,a=1,rho=1,eta=0.2,delta=-0.2,delta0=-0.1,nu=0.5) # parameters
@@ -70,18 +68,16 @@ simdata[,mean(lfp)]
 
 We have now our simulated data. 
 
-<span class="label label-success">Question 3</span> Simulate data with $a=0$ and $a=1$. Comment on the value of the coefficient of the regression of log hours on log wage and X.
+<span class="label label-success">Question 2</span> Simulate data with $a=0$ and $a=1$. Comment on the value of the coefficient of the regression of log hours on log wage and X.
 
 
 
 
 ## Heckman correction
 
-As we have seen in class, Heckman (74) offers a way for us to correct the our regression in order to recover our structural parameters. 
+As we have seen in class, Heckman (74) offers a way for us to correct the our regression in order to recover our structural parameters. We need to understand how the error term in the hour regression correlates with the labor participation decision. 
 
-As we have seen in class, we need to understand how the error term in the hour regression correlates with the labor participation decision. 
-
-<span class="label label-success">Question 4</span> Following what we did in class, and using the class note, derive the expression for the Heckman correction term as a function of known parameters. In other words, derive $E( a \xi_i + \epsilon_i | lfp=1)$.
+<span class="label label-success">Question 3</span> Following what we did in class, and using the class note, derive the expression for the Heckman correction term as a function of known parameters. In other words, derive $E( a \xi_i + \epsilon_i | lfp=1)$.
 
 Construction of this epxression requires us to recover the parameters $\delta/\sigma_xi,\delta_0/\sigma_xi$. We can get these by running a probit of participation on $Z_i$. 
 
@@ -89,22 +85,61 @@ Construction of this epxression requires us to recover the parameters $\delta/\s
 fit2 = glm(lfp ~ Z,simdata,family = binomial(link = "probit"))
 ```
 
-<span class="label label-success">Question 5</span> Check that the regression does recover correctly the coefficients. Use them to construct the inverse Mills ratio. Use the correction you created and show that the regression with this extra term delivers the correct estimates for $\gamma$ even in the case where $a\neq 0$.
+<span class="label label-success">Question 4</span> Check that the regression does recover correctly the coefficients. Use them to construct the inverse Mills ratio. Use the correction you created and show that the regression with this extra term delivers the correct estimates for $\gamma$ even in the case where $a\neq 0$.
 
 ## Repeated cross-section
 
-Lastly we want to replicate the approach of Blundell, Duncan and Meghir. To justify such an appraoach we are going to include an additional endogeneity concern between the wage and the disutility of hours of worked. We want to do the following:
+Lastly we want to replicate the approach of Blundell, Duncan and Meghir (1998) [paper <i class="fa fa-external-link" aria-hidden="true"></i>](https://www.jstor.org/stable/2999575). The paper relies on the assumption that the endogeneity term can be expressed as a the sum of a term which is group specific and a term which is time specific. To achieve this structure we simply change the distribution of the $\xi$ and make it an exponential. 
 
- 1. add the wage residual $u_i$ inside the expression for $\beta_i$ (similar to the $\xi$ term)
- 2. simulate 2 data-sets (two different cross-sections, redraw everything). However in the second cross-section change the $rho$ to 1.2
+<span class="label label-success">Question 5</span> Given that for the exponential distribution we have that $E[ X | X > a] = 1+ a$, express the new conditional mean of $\xi$ in the regression of log-hours on log-wages and X. Show that it can be writen at a linear term in $\delta_0$ and $Z_i$. 
 
-Our final step is then to try to recover the wage elasticty by differencing across periods usig the tax variation. To do so, we need to compute time specific Mills ratios. 
-
-<span class="label label-success">Question 6</span> Why do we need to estimate the parameters of the selection equation separatly for each period? 
-
-<span class="label label-success">Question 7</span> Create the heckman correction term for each observation in each period. Then cut the X into a few values (picking some threshold). Finally compute all first difference in the time dimension (including the mills ratio difference). Finally run the regression using the different group as obervations and the difference as variables. Do this allow to recover the correct $\gamma$?
+In estimation however we do not want to stricly rely on the linearity in $Z$ and hence we are going to follow the procedure in the paper and bin the $Z$ variable and rely on variation in time. The following code will simulate two cross-sections of data (not a panel). The difference from period 1 to 2 will be reflected in a change in the return to $X$ and a change in the intercept of the labor force participation intercept.
 
 
+```{r}
+simulate <- function(p,N,t) {
+  simdata = data.table(i=1:N,X=rnorm(N))
+  
+  # simulating variables
+  simdata[,X := rnorm(N)]
+  simdata[,Z := rnorm(N)]
+  simdata[,u := rnorm(N)]
+  simdata[,lw := p$eta*X + Z + 0.2*u ]  # log wage
+  
+  simdata[,xi := rexp(N)]
+  simdata[,lr := lw + p$delta0 + p$delta*Z + xi]; # log home productivity
+  
+  simdata[,eps:=rnorm(N)*0.2]
+  simdata[,beta := exp(p$nu*X  + p$a*xi +  eps)]; # heterogenous beta coefficient
+  
+  # compute decision variables
+  simdata[, lfp := log(p$rho) + lw >= lr] # labor force participation
+  simdata[, h   := (p$rho * exp(lw)/beta)^(1/p$gamma)] # hours
+  
+  # make hours and wages unobserved in case individual doesn't work
+  simdata[lfp==FALSE,h:=NA][lfp==FALSE,lw:=NA]
+  simdata[,mean(lfp)]
+  
+  # store time
+  simdata[, t := t]
+  return(simdata)
+}
+
+p  = list(gamma = 0.8,beta=1,a=1,rho=1,eta=0.2,delta=-1.0,delta0=-0.1,nu=0.5) # parameters
+N=50000  # size of the simulation
+
+# simulate period 1 
+sim1  = simulate(p,N,1); 
+p$eta = 0.4; p$delta0 = -1.1
+# simulate period 2 with different eta and delta0 (incuding intercept shifts and variation in wages)
+sim2 = simulate(p,N,2); 
+simdata = rbind(sim1,sim2) # combine the two periods
+```
+
+
+<span class="label label-success">Question 6</span> Run the regression of log-hours on log-wages and X  how describe the bias in the recovered parameters. Similary compute the inverse Mills Ratio, include in the regression and comment on the value of the estimate parameters. Is it still biased?
+
+<span class="label label-success">Question 7</span> Finally slice the $Z$ variables into deciles (or more splits) and regress log-hours on log-wage, X, dummies for each of the bins, and time $t$. This mimics the procedure of Blundell Duncan Meghir, does this recovers a coefficient closer to the estimand of interest?
 
 
 
