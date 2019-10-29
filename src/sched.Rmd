@@ -53,8 +53,8 @@ You can submit your homework either as solo or as a group of two. To communicate
 
  - <span class="label label-warning">new</span> [Homework 1](pdf/hw1_f19.pdf) (analytical) due date is Tuesday Oct 15th . 
  - [Homework 2](hw-lsupply.html) (computer) due on Sunday October 27th at midnight. 
- - [Homework 3](hw-inference.html) (computer) due date TBD. 
- - [Homework 4](pdf/hw4_w18.pdf) (analytical) due date TBD. 
+ - [Homework 3](pdf/hw3-fall19.pdf) (analytical) due Tuesday Nov 5th at 11:59 PM.
+ - [Homework 4](hw-inference.html) (computer) due date TBD. 
  - [Homework 5](hw-hetero.html) (computer) due date TBD. 
  
 ## End of class project
