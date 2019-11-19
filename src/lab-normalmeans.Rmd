@@ -1,0 +1,70 @@
+---
+title: "Lab on Normal means"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+  toc: true
+toc_depth: 3
+toc_float:
+  collapsed: false
+smooth_scroll: false
+editor_options: 
+  chunk_output_type: console
+---
+  
+## Normal means
+  
+We consider the simple model given by 
+
+$$ y_{it} = \alpha_i + \epsilon_{it} $$
+  
+For simplicity we consider the case where $\epsilon_{it}$ is Normal iid. And we consider a discrete distribution for $\alpha_i$ parametrized by $\alpha_k , p_k$.
+
+We then set our model and simulate data.
+
+```{r}
+# we consider a discrete presentation of a normal distribution for alpha
+require(Ckmeans.1d.dp)
+nk = 10
+nr=1e6
+x <- rnorm(nr)
+result <- Ckmeans.1d.dp(x,nk)
+model0 = list(eps_sd=1, p_k = tabulate(result$cluster)/nr, alpha_k = result$centers)
+
+# simulate data
+nn = 1000
+sdata = data.table(eta_i = sample.int(nk,nn,prob=model0$p_k,replace=TRUE))
+sdata[, alpha_i := model0$alpha_k[eta_i]]
+sdata[, y1 := alpha_i + model0$eps_sd * rnorm(.N)]
+sdata[, y2 := alpha_i + model0$eps_sd * rnorm(.N)]
+```
+
+## FE approach
+
+Here we want to recover the $\alpha_i$ within each individual. A natural estimator in this case is then the average.
+
+```{r}
+
+sdata[, alpha_hat := 0.5*(y1+y2)]
+sdata[,var(alpha_hat)]
+
+```
+
+## RE approach
+
+Here we want to recover the $\alpha_i$ within each individual. A natural estimator in this case is then the average.
+
+```{r}
+
+# initialize with some parameters
+model = list(eps_sd=1,pk=rep(1/nk,nk),alpha_k=seq(0,1,nk))
+
+# we compute the posererior porobabilities
+sdata[, mu_i := 0.5*(y1+y2)]
+sdata[,var(alpha_hat)]
+
+
+
+```
+
+
