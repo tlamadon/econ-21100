@@ -24,17 +24,24 @@ We then set our model and simulate data.
 
 ```{r}
 # we consider a discrete presentation of a normal distribution for alpha
-require(Ckmeans.1d.dp)
-nk = 10
-nr = 1e6
-x <- rnorm(nr)
-result <- Ckmeans.1d.dp(x,nk)
-model0 = list(eps_sd=1, p_k = tabulate(result$cluster)/nr, alpha_k = result$centers)
+# require(Ckmeans.1d.dp)
+# nk = 10
+# nr = 1e6
+# x <- rnorm(nr)
+# result <- Ckmeans.1d.dp(x,nk)
+# model0 = list(eps_sd=1, p_k = tabulate(result$cluster)/nr, alpha_k = result$centers)
+# 
+# # simulate data
+# nn = 1000
+# sdata = data.table(eta_i = sample.int(nk,nn,prob=model0$p_k,replace=TRUE))
+# sdata[, alpha_i := model0$alpha_k[eta_i]]
+# sdata[, y1 := alpha_i + model0$eps_sd * rnorm(.N)]
+# sdata[, y2 := alpha_i + model0$eps_sd * rnorm(.N)]
 
+model0 = list(eps_sd=1, alpha_sd=1.5)
 # simulate data
-nn = 1000
-sdata = data.table(eta_i = sample.int(nk,nn,prob=model0$p_k,replace=TRUE))
-sdata[, alpha_i := model0$alpha_k[eta_i]]
+nn = 50000
+sdata = data.table(alpha_i = model0$alpha_sd * rnorm(nn))
 sdata[, y1 := alpha_i + model0$eps_sd * rnorm(.N)]
 sdata[, y2 := alpha_i + model0$eps_sd * rnorm(.N)]
 ```
@@ -57,18 +64,27 @@ Here we want to recover the $\alpha_i$ within each individual. A natural estimat
 ```{r}
 
 # initialize with some parameters
-model = list(eps_sd=1,pk=rep(1/nk,nk),alpha_k=seq(0,1,nk))
+model = list(eps_sd=0.1,alpha_sd=0.1)
+rr = data.frame()
+for (rep in 1:15) {
+  # we compute the posererior porobabilities
+  s = 1/(1/model$alpha_sd^2 + 2/model$eps_sd^2)
+  sdata[, mu_i := s * (y1+y2)/model$eps_sd^2]
+  sdata[, alpha_i_draw := mu_i + sqrt(s) * rnorm(.N)]
+  
+  model$eps_sd   = sqrt(sdata[, 0.5*(var( y2 - alpha_i_draw) + var( y1 - alpha_i_draw) )])
+  model$alpha_sd = sqrt(sdata[, var(alpha_i_draw)])
+  
+  flog.info("eps_sd=%4.4f eps_alpha=%4.4f",model$eps_sd,model$eps_sd)
+  rr = rbind(rr,data.frame(model))
+}
 
-model = list(eps_sd=1,alpha_sd=1)
-
-# we compute the posererior porobabilities
-s = 1/(1/model$alpha_sd^2 + 2/model$eps_sd^2)
-sdata[, mu_i := s * (y1+y2)/model$eps_sd^2]
-sdata[, alpha_i_draw := mu_i + s * rnorm(.N)]
-sdata[,var(alpha_i_draw)]
-
-
-
+rr$t=1:15
+ggplot(rr,aes(x=t,y=eps_sd)) + geom_line() + theme_bw() + geom_line(aes(y=alpha_sd))
 ```
+
+## Variational approach
+
+We now are going to also estaimate the posterior. Basically we estimate also a linear function for the mean and variance of the posterior. 
 
 
