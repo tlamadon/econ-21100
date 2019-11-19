@@ -11,6 +11,12 @@ smooth_scroll: false
 editor_options: 
   chunk_output_type: console
 ---
+
+```{r}
+library(futile.logger)
+library(data.table)
+```
+  
   
 ## Normal means
   
