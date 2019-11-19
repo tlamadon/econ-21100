@@ -26,7 +26,7 @@ We then set our model and simulate data.
 # we consider a discrete presentation of a normal distribution for alpha
 require(Ckmeans.1d.dp)
 nk = 10
-nr=1e6
+nr = 1e6
 x <- rnorm(nr)
 result <- Ckmeans.1d.dp(x,nk)
 model0 = list(eps_sd=1, p_k = tabulate(result$cluster)/nr, alpha_k = result$centers)
@@ -59,9 +59,13 @@ Here we want to recover the $\alpha_i$ within each individual. A natural estimat
 # initialize with some parameters
 model = list(eps_sd=1,pk=rep(1/nk,nk),alpha_k=seq(0,1,nk))
 
+model = list(eps_sd=1,alpha_sd=1)
+
 # we compute the posererior porobabilities
-sdata[, mu_i := 0.5*(y1+y2)]
-sdata[,var(alpha_hat)]
+s = 1/(1/model$alpha_sd^2 + 2/model$eps_sd^2)
+sdata[, mu_i := s * (y1+y2)/model$eps_sd^2]
+sdata[, alpha_i_draw := mu_i + s * rnorm(.N)]
+sdata[,var(alpha_i_draw)]
 
 
 
