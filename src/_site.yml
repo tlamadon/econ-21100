@@ -16,6 +16,8 @@ navbar:
       href: lab-labor-supply.html
     - text: Discrete choice
       href: lab-discretechoice.html
+    - text: Normal Means
+      href: lab-normalmeans.html
     - text: Dynamic choice
       href: lab-dynchoice.html
     - text: Many regressors

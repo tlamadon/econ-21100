@@ -27,7 +27,7 @@ PAGES = \
 	docs/TA-Rregression.html \
 	docs/TA-Rtutorial.html 
 
-docs/%.html: src/%.Rmd
+docs/%.html: src/%.Rmd src/_site.yml
 	R -e "rmarkdown::render_site('./$<')"
 
 all: $(PAGES)

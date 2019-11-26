@@ -31,6 +31,7 @@ You can download the notes for the class:
   - Unobserved heterogeneity
     - Revisit multinomial problem and IIA 
     - Random effect model and EM-algorithm
+    - Introduction to Variational Auto Encoders [VAE <i class="fa fa-external-link" aria-hidden="true"></i>](https://arxiv.org/abs/1312.6114)
   - Topics in non-parametrics and high-dimensional econometrics
     - model complexity and bias/variance trade-off
     - many regressors (application to network of peers)

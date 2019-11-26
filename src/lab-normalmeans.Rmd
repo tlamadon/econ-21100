@@ -58,8 +58,8 @@ Here we want to recover the $\alpha_i$ within each individual. A natural estimat
 
 ```{r}
 
-sdata[, alpha_hat := 0.5*(y1+y2)]
-sdata[,var(alpha_hat)]
+sdata[, alpha_hat_fe := 0.5*(y1+y2)]
+sdata[,var(alpha_hat_fe)]
 
 ```
 
