@@ -71,7 +71,7 @@ rr = data.table( foreach (lambda = seq(0,5,l=20),.combine=rbind) %:% foreach (i 
 
 rs = rr[,list(bias=mean(value-value0)^2,var=var(value-value0),mse=mean((value-value0)^2)),list(name,lambda)]
 ggplot(rs[name=="X1"],aes(x=lambda,y=mse)) + geom_line() + theme_bw() + 
-  geom_line(aes(y=bias),color="red") + geom_line(aes(y=var),color="blue") +scale_y_log10() +
+  geom_line(aes(y=bias),color="red") + geom_line(aes(y=var),color="blue") + # scale_y_log10() +
   geom_vline(xintercept = rs[name=="X1"][which.min(mse),lambda],linetype=2)
 
 ls = unique(rr$lambda)[c(1,5,10,15)]
@@ -107,9 +107,23 @@ rr3 = melt(rr2,id.vars = "name")
 rr3$var = as.integer(str_replace(rr3$variable,"X",""))
 ggplot(rr3,aes(x=var,y=value,color=name)) + geom_point() + geom_line() + theme_bw()
 
-ggplot(rr3,aes(x=var,y=value,color=name)) + geom_point() + geom_line() + theme_bw()
-
 ```
+
+## Running cross-validation
+
+```{r}
+
+X = array(rnorm(p2*n),c(n,p2));
+Y = X %*% c(beta,rep(0,p2-p)) + sigma*rnorm(n)
+
+# compute the Lasso with cross-validation
+cvfit <- glmnet::cv.glmnet(X, Y,alpha=0,intercept=FALSE)
+cvfit$lambda.min
+
+plot(cvfit)
+coef(cvfit)
+```
+
 
 ## Lasso
 

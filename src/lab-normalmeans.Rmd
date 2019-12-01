@@ -93,4 +93,26 @@ ggplot(rr,aes(x=t,y=eps_sd)) + geom_line() + theme_bw() + geom_line(aes(y=alpha_
 
 We now are going to also estaimate the posterior. Basically we estimate also a linear function for the mean and variance of the posterior. 
 
+## Cross validating
 
+```{r}
+
+model0 = list(eps_sd=1, alpha_sd=1.5)
+# simulate data
+nn = 100
+sdata = data.table(wid=1:nn,alpha_i = model0$alpha_sd * rnorm(nn))
+pdata = data.table()
+for (t in 1:5) {
+  sdata[, y := alpha_i + model0$eps_sd * rnorm(.N)]
+  pdata = rbind(pdata,sdata[,list(y,t=t,wid)])
+}
+
+XX = model.matrix(y ~ factor(wid), pdata)
+cvfit <- glmnet::cv.glmnet(XX,pdata$y,alpha=0)
+plot(cvfit)
+
+cvfit$lambda.1se
+alpha_hat = as.numeric(coef(cvfit))
+
+
+```
