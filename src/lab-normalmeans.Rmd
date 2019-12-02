@@ -93,4 +93,16 @@ ggplot(rr,aes(x=t,y=eps_sd)) + geom_line() + theme_bw() + geom_line(aes(y=alpha_
 
 We now are going to also estaimate the posterior. Basically we estimate also a linear function for the mean and variance of the posterior. 
 
+```{r}
+
+# construct data with additional random draw
+sdata[, eta_i := rnorm(.N)]
+
+Y = c(sdata$eta_i)
+
+
+
+```
+
+
 
